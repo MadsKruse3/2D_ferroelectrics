@@ -1,0 +1,27 @@
+{
+ "object_id": "asr.core.results::ASRResult",
+ "constructor": "asr.core.results::ASRResult",
+ "args": [],
+ "kwargs": {
+  "data": {},
+  "metadata": {
+   "asr_name": "asr.database.key_descriptions",
+   "resources": {
+    "time": 0.05402374267578125,
+    "ncores": 1,
+    "tstart": 1671206016.4913206,
+    "tend": 1671206016.5453444
+   },
+   "params": {
+    "database": "database.db"
+   },
+   "code_versions": {
+    "asr": "0.4.1-328ea37138eec98c3739c4c4f24d0ac9018081c1",
+    "ase": "3.23.0b1-ca38c75a67dc58aa6080f889eb25588db94198b0",
+    "gpaw": "21.6.1b1-1f0dfc9eae10e6e87f8b0fd621fc6f384de14668"
+   },
+   "creates": {}
+  },
+  "strict": null
+ }
+}

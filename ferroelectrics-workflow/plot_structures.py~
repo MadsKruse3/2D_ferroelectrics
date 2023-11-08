@@ -1,0 +1,140 @@
+from asr.core import read_json
+import numpy as np
+from matplotlib import pyplot as plt
+import matplotlib.image as mpimg
+import matplotlib.patheffects as path_effects
+import os, sys
+from PIL import Image 
+
+fig, ax = plt.subplots()
+ax = plt.gca()    
+ax.set_xlim(0, 200)
+ax.set_ylim(0, 200)    
+
+img = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/BrClTipolarfront.png')
+img2 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/BrClTipolarside.png')
+img3 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/BrClTipolarside2.png')
+
+ax.imshow(img, aspect='auto', extent=(0, 170, 8, 128))
+ax.imshow(img2, aspect='auto', extent=(0, 170, 58, 178))
+ax.imshow(img3, aspect='auto', extent=(100, 220, 8, 128))
+ax.text(160, 120, 'BrClTi', verticalalignment='center', horizontalalignment='center', fontsize=20)
+
+ax.axis('off')
+fig.tight_layout()
+fig.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/BrClTipolarall.png', dpi=400, bbox_inches = 'tight')
+
+fig, ax = plt.subplots()
+ax = plt.gca()    
+ax.set_xlim(0, 200)
+ax.set_ylim(0, 200)    
+
+img = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Ge2S2polarfront.png')
+img2 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Ge2S2polarside.png')
+img3 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Ge2S2polarside2.png')
+
+ax.imshow(img, aspect='auto', extent=(0, 175, 0, 150))
+ax.imshow(img2, aspect='auto', extent=(0, 175, 50, 200))
+ax.imshow(img3, aspect='auto', extent=(25, 200, 0, 150))
+ax.text(100, 125, 'Ge$_{2}$S$_{2}$', verticalalignment='center', horizontalalignment='center', fontsize=20)
+
+ax.axis('off')
+fig.tight_layout()
+fig.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Ge2S2polarall.png', dpi=400, bbox_inches = 'tight')
+
+fig, ax = plt.subplots()
+ax = plt.gca()    
+ax.set_xlim(0, 200)
+ax.set_ylim(0, 200)    
+
+img = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/In2Te4polarfront.png')
+img2 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/In2Te4polarside.png')
+img3 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/In2Te4polarside2.png')
+
+ax.imshow(img, aspect='auto', extent=(0, 200, 20, 220))
+ax.imshow(img2, aspect='auto', extent=(0, 200, 40, 200))
+ax.imshow(img3, aspect='auto', extent=(50, 300, 20, 220))
+ax.text(170, 125, 'In$_{2}$Te$_{4}$', verticalalignment='center', horizontalalignment='center', fontsize=20)
+
+ax.axis('off')
+fig.tight_layout()
+fig.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/In2Te4polarall.png', dpi=400, bbox_inches = 'tight')
+
+fig, ax = plt.subplots()
+ax = plt.gca()    
+ax.set_xlim(0, 200)
+ax.set_ylim(0, 200)    
+
+img = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Cr2Mo2S8polarfront.png')
+img2 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Cr2Mo2S8polarside.png')
+img3 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Cr2Mo2S8polarside2.png')
+
+ax.imshow(img, aspect='auto', extent=(0, 190, 0, 180))
+ax.imshow(img2, aspect='auto', extent=(0, 190, 20, 200))
+ax.imshow(img3, aspect='auto', extent=(35, 185, 0, 170))
+ax.text(110, 105, 'Cr$_{2}$Mo$_{2}$S$_{8}$', verticalalignment='center', horizontalalignment='center', fontsize=20)
+
+ax.axis('off')
+fig.tight_layout()
+fig.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Cr2Mo2S8polarall.png', dpi=400, bbox_inches = 'tight')
+
+fig, ax = plt.subplots()
+ax = plt.gca()    
+ax.set_xlim(0, 200)
+ax.set_ylim(0, 200)    
+
+img = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/As2O6Sb2polarfront.png')
+img2 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/As2O6Sb2polarside.png')
+img3 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/As2O6Sb2polarside2.png')
+
+ax.imshow(img, aspect='auto', extent=(0, 190, 0, 200))
+ax.imshow(img2, aspect='auto', extent=(0, 190, 5, 205))
+ax.imshow(img3, aspect='auto', extent=(20, 220, 0, 200))
+ax.text(120, 105, 'Sb$_{2}$As$_{2}$O$_{6}$', verticalalignment='center', horizontalalignment='center', fontsize=20)
+
+ax.axis('off')
+fig.tight_layout()
+fig.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/As4O6polarall.png', dpi=400, bbox_inches = 'tight')
+
+fig, ax = plt.subplots()
+ax = plt.gca()    
+ax.set_xlim(0, 200)
+ax.set_ylim(0, 200)    
+
+img = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/CuInP2Se6polarfront.png')
+img2 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/CuInP2Se6polarside.png')
+img3 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/CuInP2Se6polarside2.png')
+
+ax.imshow(img, aspect='auto', extent=(-35, 275, 0, 210))
+ax.imshow(img2, aspect='auto', extent=(-35, 275, 0, 210))
+ax.imshow(img3, aspect='auto', extent=(60, 260, 0, 200))
+ax.text(158, 105, 'CuInP$_{2}$Se$_{6}$', verticalalignment='center', horizontalalignment='center', fontsize=20)
+
+ax.axis('off')
+fig.tight_layout()
+fig.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/CuInP2Se6polarall.png', dpi=400, bbox_inches = 'tight')
+
+fig, ax = plt.subplots()
+ax = plt.gca()    
+ax.set_xlim(0, 600)
+ax.set_ylim(0, 300)    
+
+img = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/BrClTipolarall.png')
+img2 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Ge2S2polarall.png')
+img3 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/In2Te4polarall.png')
+img4 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Cr2Mo2S8polarall.png')
+img5 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/As4O6polarall.png')
+img6 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/CuInP2Se6polarall.png')
+
+ax.imshow(img, aspect='auto', extent=(0, 200, 0, 150))
+ax.imshow(img2, aspect='auto', extent=(250, 450, 0, 150))
+ax.imshow(img3, aspect='auto', extent=(375, 575, 0, 150))
+ax.imshow(img4, aspect='auto', extent=(50, 250, 120, 270))
+ax.imshow(img5, aspect='auto', extent=(230, 430, 120, 270))
+ax.imshow(img6, aspect='auto', extent=(380, 580 , 120, 270))
+
+ax.axis('off')
+fig.tight_layout()
+fig.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/polarmaterialsprototype_new.png', dpi=400, bbox_inches = 'tight')
+fig.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/polarmaterialsprototype_new.pdf', dpi=800, bbox_inches = 'tight')
+

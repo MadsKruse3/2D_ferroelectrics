@@ -1,0 +1,35 @@
+
+Tabulate Latex:
+\begin{tabular}{llrlrrrrrl}
+\hline
+ Name                & Spacegroup   &   \$\textbackslash{}text\{P\}\textbackslash{}perp [\textbackslash{}text\{pC\}/\textbackslash{}text\{m\}]\$ & \$\textbackslash{}text\{P\}\_\{top\} [|e|]\$   &   \$\textbackslash{}Delta \textbackslash{}text\{E\} [\textbackslash{}text\{meV\}/\textbackslash{}text\{Å\}\^{}2]\$ &   \$\textbackslash{}mathcal\{E\}\_\{\textbackslash{}text\{c\}\} [\textbackslash{}text\{nV\}/\textbackslash{}text\{m\}\$ &   Gap [eV] &   \$\textbackslash{}omega [\textbackslash{}text\{meV\}]\$ &   EH \$[\textbackslash{}text\{eV\}/\textbackslash{}text\{atom\}]\$ & ID      \\
+\hline
+ AgBiP\$\_\{2\}\$Se\$\_\{6\}\$ & P3           &                                  1.39  & ('1/3', '2/3')           &                                        25   &                                           6.51 &       1.1  &                   -4.14 &                           0    & 4327327 \\
+ CuBiP\$\_\{2\}\$Se\$\_\{6\}\$ & P3           &                                  2.5   & ('2/3', '1/3')           &                                        23.6 &                                          18.4  &       1    &                   -5.83 &                           0    & 4327329 \\
+ CuInP\$\_\{2\}\$Se\$\_\{6\}\$ & P3           &                                  3.67  & ('1/3', 0)               &                                        31.4 &                                          22.2  &       0.49 &                   -7.95 &                           0    & 4327329 \\
+ CSiF\$\_\{2\}\$          & P3m1         &                                  0.639 & (0, 0)                   &                                       469   &                                          21.6  &       1.9  &                  -89.3  &                           0.6  & -       \\
+ CSiH\$\_\{2\}\$          & P3m1         &                                 19.3   & (0, 0)                   &                                       728   &                                          36.1  &       3.8  &                 -140    &                           0.06 & -       \\
+ InP                 & P3m1         &                                 12.4   & (0, 0)                   &                                       172   &                                          12.1  &       1.1  &                  -38    &                           0.4  & -       \\
+\hline
+\end{tabular}
+
+Texttable Latex:
+\begin{table}
+	\begin{center}
+		\begin{tabular}{c|c|c|c|c|c|c|c|c|c}
+			Name & Spacegroup & $\text{P}\perp [\text{pC}/\text{m}]$ & $\text{P}_{top} [|e|]$ & $\Delta \text{E} [\text{meV}/\text{Å}^2]$ & $\mathcal{E}_{\text{c}} [\text{nV}/\text{m}$ & Gap [eV] & $\omega [\text{meV}]$ & EH $[\text{eV}/\text{atom}]$ & ID \\
+			\hline
+			AgBiP$_{2}$Se$_{6}$ & P3 & 1.39 & ('1/3', '2/3') & 25.0 & 6.51 & 1.1 & -4.14 & 0 & 4327327 \\
+			CuBiP$_{2}$Se$_{6}$ & P3 & 2.50 & ('2/3', '1/3') & 23.6 & 18.4 & 1.0 & -5.83 & 0 & 4327329 \\
+			CuInP$_{2}$Se$_{6}$ & P3 & 3.67 & ('1/3', 0) & 31.4 & 22.2 & 0.49 & -7.95 & 0 & 4327329 \\
+			CSiF$_{2}$ & P3m1 & 0.639 & (0, 0) & 469 & 21.6 & 1.9 & -89.3 & 0.6 & - \\
+			CSiH$_{2}$ & P3m1 & 19.3 & (0, 0) & 728 & 36.1 & 3.8 & -140 & 0.06 & - \\
+			InP & P3m1 & 12.4 & (0, 0) & 172 & 12.1 & 1.1 & -38.0 & 0.4 & - \\
+		\end{tabular}
+	\end{center}
+	\caption{The table contains materials which 
+        have a polarization component out of plane only. The columns show material names, 
+        spacegroups, out of plane spontaneous polarization, energy differences, coercive fields,
+        band gaps in the polar structure, phonon energies of the lowest phonon mode at the
+        $\Gamma$-point of the non-polar structure, energy above convex hull and finally the ICSD or COD id.}
+\end{table}

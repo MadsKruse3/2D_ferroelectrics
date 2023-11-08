@@ -1,0 +1,40 @@
+
+Tabulate Latex:
+\begin{tabular}{llrlrrrrl}
+\hline
+ Name                & Spacegroup   &   P\$\_\{\textbackslash{}perp\}\$ \$[\textbackslash{}text\{pC\}/\textbackslash{}text\{m\}]\$ & P\$\_\{\textbackslash{}text\{top\}\}\$   &   \$\textbackslash{}Delta\textbackslash{}text\{E\}\$ \$[\textbackslash{}text\{meV\}/\textbackslash{}text\{Å\}\^{}2]\$ &   \$\textbackslash{}mathcal\{E\}\_\{\textbackslash{}text\{c\}\}\$ \$[\textbackslash{}text\{V\}/\textbackslash{}text\{nm\}]\$ &   Gap [eV] &   EH \$[\textbackslash{}text\{eV\}/\textbackslash{}text\{atom\}]\$ & ID      \\
+\hline
+ CuInP\$\_\{2\}\$S\$\_\{6\}\$  & P3           &                                4.99  & ('-1/3', '1/3')    &                                       14.7   &                                             58.2  &       1.5  &                          0     & -       \\
+ CuInP\$\_\{2\}\$Se\$\_\{6\}\$ & P3           &                                3.67  & ('-1/3', '1/3')    &                                        8.17  &                                             13.7  &       0.49 &                          0     & 71969   \\
+ BiCuP\$\_\{2\}\$Se\$\_\{6\}\$ & P3           &                                2.51  & ('1/3', '-1/3')    &                                        8.14  &                                             27.3  &       1    &                          0     & 4327329 \\
+ AgBiP\$\_\{2\}\$Se\$\_\{6\}\$ & P3           &                                1.39  & ('-1/3', '1/3')    &                                        0.336 &                                              3.84 &       1.1  &                          0     & 4327327 \\
+ CF\$\_\{2\}\$Si          & P3m1         &                                0.656 & (0, 0)             &                                      295     &                                             10.7  &       1.9  &                          0.6   & -       \\
+ CH\$\_\{2\}\$Si          & P3m1         &                               19.4   & (0, 0)             &                                      544     &                                           1680    &       3.8  &                          0     & -       \\
+ InP                 & P3m1         &                               12.5   & (0, 0)             &                                        3.45  &                                              1.69 &       1.1  &                          0.4   & -       \\
+ In\$\_\{2\}\$Se\$\_\{3\}\$    & P3m1         &                               16.9   & ('1/3', '-1/3')    &                                       70     &                                              9.01 &       0.75 &                          0.008 & -       \\
+\hline
+\end{tabular}
+
+Texttable Latex:
+\begin{table}
+	\begin{center}
+		\begin{tabular}{c|c|c|c|c|c|c|c|c}
+			Name & Spacegroup & P$_{\perp}$ $[\text{pC}/\text{m}]$ & P$_{\text{top}}$ & $\Delta\text{E}$ $[\text{meV}/\text{Å}^2]$ & $\mathcal{E}_{\text{c}}$ $[\text{V}/\text{nm}]$ & Gap [eV] & EH $[\text{eV}/\text{atom}]$ & ID \\
+			\hline
+			CuInP$_{2}$S$_{6}$ & P3 & 4.99 & ('-1/3', '1/3') & 14.7 & 58.2 & 1.5 & 0 & - \\
+			CuInP$_{2}$Se$_{6}$ & P3 & 3.67 & ('-1/3', '1/3') & 8.17 & 13.7 & 0.49 & 0 & 71969 \\
+			BiCuP$_{2}$Se$_{6}$ & P3 & 2.51 & ('1/3', '-1/3') & 8.14 & 27.3 & 1.0 & 0 & 4327329 \\
+			AgBiP$_{2}$Se$_{6}$ & P3 & 1.39 & ('-1/3', '1/3') & 0.336 & 3.84 & 1.1 & 0 & 4327327 \\
+			CF$_{2}$Si & P3m1 & 0.656 & (0, 0) & 295 & 10.7 & 1.9 & 0.6 & - \\
+			CH$_{2}$Si & P3m1 & 19.4 & (0, 0) & 544 & 1.68e+03 & 3.8 & 0 & - \\
+			InP & P3m1 & 12.5 & (0, 0) & 3.45 & 1.69 & 1.1 & 0.4 & - \\
+			In$_{2}$Se$_{3}$ & P3m1 & 16.9 & ('1/3', '-1/3') & 70.0 & 9.01 & 0.75 & 0.008 & - \\
+		\end{tabular}
+	\end{center}
+	\caption{The table contains materials which 
+        have a polarization component out of plane only. The columns show material names, 
+        spacegroups, out of plane spontaneous polarization, energy differences, coercive fields,
+        band gaps in the polar structure, phonon energies of the lowest phonon mode at the
+        $\Gamma$-point of the non-polar structure, energy above convex hull and finally the ICSD or COD id.}
+	\label{tab:out-of-plane}
+\end{table}

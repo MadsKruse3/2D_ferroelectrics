@@ -1,0 +1,265 @@
+import numpy as np
+import re, sys, os
+from ase.io import read
+from evgraf import find_inversion_symmetry
+import matplotlib.pyplot as plt
+from asr.core import read_json
+from ase.units import kJ
+from asr.utils.symmetry import atoms2symmetry
+
+def get_polarization_direction(folder):
+    polarpointgroups1 = ['1', '2', 'm', 'mm2']
+    polarpointgroups2 = ['3', '3m', '4', '4mm', '6', '6mm']
+    rotations = [[[1, 0, 0],
+                 [0, 1, 0],
+                 [0, 0, -1]],
+                 [[-1, 0, 0],
+                 [0, 1, 0],
+                 [0, 0, -1]],
+                 [[1, 0, 0],
+                 [0, -1, 0],
+                 [0, 0, -1]]]
+
+    atom = read(f"{folder}/structure.json")
+    data = atoms2symmetry(atom, tolerance=0.1, angle_tolerance=0.1)
+    pointgroup = data.dataset['pointgroup']                   
+    config = ''
+    if pointgroup in polarpointgroups1:
+        data = read_json(f"{folder}/results-asr.structureinfo.json")
+        rot_matrices = data["spglib_dataset"]["rotations"]
+        for x in rot_matrices:
+            for y in rotations:
+                if np.array_equal(x,y):
+                    config = 'in plane'
+        if config == '':
+            config = '3D'
+    if pointgroup in polarpointgroups2:
+        config = 'out of plane'
+
+    data_pol = read_json(f"{folder}/results-asr.polarization_path.json")
+    if config == 'in plane':
+        pol = data_pol["P_tot"]
+    if config == 'out of plane':
+        pol = abs(data_pol["Pz"])
+    if config == '3D':
+        pol_in_plane = np.array(data_pol["Px"]**2 + data_pol["Py"]**2)
+        pol_out_of_plane = data_pol["Pz"]
+        pol_tot = data_pol["P_tot"]
+        pol = [pol_in_plane, pol_out_of_plane, pol_tot]
+    return config, pol
+
+def get_gradients_NEB(folder):
+    atom = read(f'{folder}/structure.json')
+    n = len(atom)
+    cell_vc = atom.get_cell().T*1e-10
+    A = np.linalg.norm(np.cross(cell_vc[0], cell_vc[1]))
+        
+    data = read_json(f"{folder}/results-asr.polarization_path2.json")
+    a = getattr(data, 'data')
+    pol = a["P_tot"]
+    Px_path = a["Px_path"]
+    Py_path = a["Py_path"]
+    Pz_path = a["Pz_path"]
+    Ptot_path = []
+    config = get_polarization_direction(folder)[0]
+    if config == 'in plane':
+        for x in np.arange(len(Px_path)):
+            Ptot_path.append(np.sqrt( (Px_path[x]-Px_path[0])**2 + (Py_path[x]-Py_path[0])**2))
+    if config == 'out of plane':
+        for x in np.arange(len(Px_path)):
+            Ptot_path.append(np.sqrt( (Pz_path[x]-Pz_path[0])**2))
+    if config == '3D':
+        for x in np.arange(len(Px_path)):
+            Ptot_path.append(np.sqrt((Px_path[x]-Px_path[0])**2 + (Py_path[x]-Py_path[0])**2 + (Pz_path[x]-Pz_path[0])**2))
+
+    E = a["E"]
+    path_points = a["path_points"]
+    P = np.array(Ptot_path)*(1e-7)*A ## Convert units from nC/m to C*cm (A has units of m^2) 
+    E = np.array(E)*(1/kJ) ## Convert from eV to J and from J to kJ
+
+    Coercive_fields_NEB = []    
+    for i in np.arange(1,len(E)-1):
+        Coercive_fields_NEB.append( (1/2)*((E[i+1]-E[i])/(P[i+1]-P[i]) + (E[i]-E[i-1])/(P[i]-P[i-1])) )
+
+    Coercive_fields_NEB = np.array(Coercive_fields_NEB)
+    Coercive_field_NEB = np.max(np.abs(Coercive_fields_NEB))
+    #Polarization = Ptot_path[-1]
+    return Coercive_field_NEB
+
+def get_data(folder):
+
+    atom = read(f'{folder}/structure.json')
+    n = len(atom)
+    cell_vc = atom.get_cell().T
+    A = np.linalg.norm(np.cross(cell_vc[0], cell_vc[1]))
+
+    data_pol = read_json(f"{folder}/results-asr.polarization_path.json")
+    E_barrier = data_pol["E_barrier"]
+    Ediff_pr_cell = E_barrier/A            
+    Ediff_pr_cell = np.array(Ediff_pr_cell)*1e3
+
+    config = get_polarization_direction(folder)[0]
+    pol = get_polarization_direction(folder)[1]
+    if config == '3D':
+        pol = pol[2]
+    #Coercive_field = get_gradients_NEB(folder)
+    #return pol, Ediff_pr_cell, Coercive_field
+    return pol, Ediff_pr_cell
+
+def check_gaps(folder):
+    lambdas = np.linspace(0, 1, 15)
+    gaps = []
+    for x in lambdas:
+        dpath = f'{folder}/structure_{x}.txt'
+        lines = []
+        with open(dpath, 'r') as read_obj:                
+            for line in read_obj:
+                line = line.strip()
+                lines.append(line)
+                if 'Gap' in line:
+                    newline = str(str(line).split("(")[-1]).split(",")[-1]
+                    newline = str(newline).split(")")[-1]
+                    gap = newline
+                    gaps.append(gap)
+
+                if 'No gap' in line:
+                    newline = str(str(line).split("(")[-1]).split(",")[-1]
+                    gap = newline
+                    gaps.append(gap)
+        read_obj.close()
+
+    if 'No gap' in gaps:
+        return False
+    if not 'No gap' in gaps:
+        return True
+
+def check_polar_symmetry(folder):
+    polar_pointgroups = [1, 2, 3, 4, 6, "m", "mm2", "3m", "4mm", "6mm"]
+    data = read_json(f"{folder}/results-asr.structureinfo.json")
+    pointgroup = data["pointgroup"]
+    if pointgroup in polar_pointgroups:
+        return True
+    else:
+        return False
+
+if __name__ == "__main__":
+    from pathlib import Path
+    from argparse import ArgumentParser
+    parser = ArgumentParser()
+    parser.add_argument("folders", nargs="*", help="Monolayer folders to analyse.")
+
+    args = parser.parse_args()
+    
+    if len(args.folders) > 0:
+        folders = [Path(x).absolute() for x in args.folders]
+    else:
+        folders = [Path(".").absolute()]
+
+    Pols = []
+    Energy_pr_area = []
+    #Coercive_fields = []
+
+    #Pols_FM = []
+    #Energy_pr_cell_FM = []
+    #Coercive_fields_FM = []
+
+    #Pol_GeS = []
+    #Energy_pr_cell_GeS = []
+    #Coercive_field_GeS = []
+
+    Pols_in_plane = []
+    Pols_out_of_plane = []
+    Pols_3D = []
+
+    Energy_pr_area_in_plane = []
+    Energy_pr_area_out_of_plane = []
+    Energy_pr_area_3D = []
+
+    for folder in folders:
+        if os.path.isfile(f"{folder}/results-asr.polarization_path.json") and os.path.isfile(f"{folder}/centrosymmetric_structure/results-asr.phonons_new.json"):
+            if check_polar_symmetry(folder):
+                if check_gaps(folder):
+                    pol, Ediff_pr_area = get_data(folder)
+                    Pols.append(pol)
+                    #Energy_pr_area.append(Ediff_pr_area)
+
+                    config, pol = get_polarization_direction(folder)
+                    if config == 'in plane':
+                        Pols_in_plane.append(pol)
+                        Energy_pr_area_in_plane.append(Ediff_pr_area)
+                    if config == 'out of plane':
+                        Pols_out_of_plane.append(pol)
+                        Energy_pr_area_out_of_plane.append(Ediff_pr_area)
+                    if config == '3D':
+                        Pols_3D.append(pol[2])
+                        Energy_pr_area_3D.append(Ediff_pr_area)
+
+                    #if f"{folder}" == "/home/niflheim/madkru/2D_Ferroelectrics/tree/AB/GeS/Ge2S2-ecbb7c185669":
+                    #    Pol_GeS.append(pol)
+                    #    Energy_pr_cell_GeS.append(Ediff_pr_cell)
+                    #    #Coercive_field_GeS.append(Coercive_field)
+
+                    
+    
+    os.chdir('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/')
+    plt.rcParams['font.family'] = 'serif'
+    plt.rcParams['font.serif'] = ['Times New Roman'] + plt.rcParams['font.serif']
+    plt.rcParams['axes.labelsize'] = 'large'
+    plt.rcParams['font.size'] = 12
+    
+    plt.figure()
+    l4 = plt.scatter(Energy_pr_area_in_plane, (1e3)*np.array(Pols_in_plane), c='b', alpha=0.5)
+    l5 = plt.scatter(Energy_pr_area_out_of_plane, (1e3)*np.array(Pols_out_of_plane), c='r', alpha=0.5)
+    l6 = plt.scatter(Energy_pr_area_3D, (1e3)*np.array(Pols_3D), c='orange', alpha=0.5)
+    #l5 = plt.scatter(Energy_pr_area_FM, Pols_FM, c='red', alpha=0.5)
+    #l5 = plt.scatter(Energy_pr_area_GeS, (1e3)*np.array(Pol_GeS), c='red', alpha=0.5)
+    #plt.gca().legend((l4, l5), ('2D Ferroelectrics', 'GeS'), loc='upper left', shadow=True, bbox_to_anchor=(1, 1))
+    #plt.gca().legend((l4, l5, l6), ('in plane', 'out of plane', 'mixed'), loc='upper right', shadow=True)
+    #plt.gca().legend((l4, l5, l6), ('in plane', 'out of plane', 'mixed'), shadow=True, bbox_to_anchor=(0.6,0.5))
+    plt.xlabel('Energy difference pr. area [meV/Å$^{2}$]')
+    plt.ylabel('Polarization [pC/m]')
+    plt.tight_layout()
+    plt.savefig('energy_pr_cell_polarization_scatterplot.png')
+    plt.savefig('energy_pr_cell_polarization_scatterplot.pdf')
+
+    fig, ax = plt.subplots(figsize=[5, 4])
+    #l4 = ax.scatter(Energy_pr_cell, (1e3)*np.array(Pols), c='b', alpha=0.5)
+    #l5 = ax.scatter(Energy_pr_cell_GeS, (1e3)*np.array(Pol_GeS), c='red', alpha=0.5)
+    l4 = plt.scatter(Energy_pr_area_in_plane, (1e3)*np.array(Pols_in_plane), c='b', alpha=0.5)
+    l5 = plt.scatter(Energy_pr_area_out_of_plane, (1e3)*np.array(Pols_out_of_plane), c='red', alpha=0.5)
+    l6 = plt.scatter(Energy_pr_area_3D, (1e3)*np.array(Pols_3D), c='orange', alpha=0.5)
+    #plt.gca().legend((l4, l5, l6), ('in plane', 'out of plane', 'mixed'), loc='upper left', shadow=True)
+    plt.gca().legend((l4, l5, l6), ('in plane', 'out of plane', 'mixed'), shadow=True, bbox_to_anchor=(0.5,0.5))
+    ax.set_xlabel('Energy difference pr. area [meV/Å$^{2}$]')
+    ax.set_ylabel('Polarization [pC/m]')
+
+    axins = ax.inset_axes([0.5, 0.5, 0.47, 0.47])
+    #l4 = axins.scatter(Energy_pr_cell, (1e3)*np.array(Pols), c='b', alpha=0.5)
+    #l5 = axins.scatter(Energy_pr_cell_GeS, (1e3)*np.array(Pol_GeS), c='red', alpha=0.5)
+    l4 = axins.scatter(Energy_pr_area_in_plane, (1e3)*np.array(Pols_in_plane), c='b', alpha=0.5)
+    l5 = axins.scatter(Energy_pr_area_out_of_plane, (1e3)*np.array(Pols_out_of_plane), c='red', alpha=0.5)
+    l6 = axins.scatter(Energy_pr_area_3D, (1e3)*np.array(Pols_3D), c='orange', alpha=0.5)
+
+    x1, x2, y1, y2 = 0, 55, 0, 550
+    axins.set_xlim(x1, x2)
+    axins.set_ylim(y1, y2)
+    axins.set_xticklabels([])
+    axins.set_yticklabels([])
+    #axins.axhline(y=0.0, color='grey', linestyle='--')
+    #axins.axvline(x=0.0, color='grey', linestyle='--')
+    ax.indicate_inset_zoom(axins, edgecolor="black")
+    plt.tight_layout()
+    plt.savefig('energy_pr_cell_polarization_scatterplot_with_insert.png')
+    plt.savefig('energy_pr_cell_polarization_scatterplot_with_insert.pdf')
+
+    #plt.figure()
+    #l4 = plt.scatter(Coercive_fields, Pols, c='b', alpha=0.5)
+    ##l5 = plt.scatter(Coercive_fields_FM, (1e3)*Pols_FM, c = 'red', alpha=0.5)
+    #l5 = plt.scatter(Coercive_fields_GeS, (1e3)*Pols_GeS, c = 'red', alpha=0.5)
+    ##plt.xlim([-1,20])
+    #plt.gca().legend((l4, l5), ('2D Ferroelectrics', 'GeS'), loc='upper left', shadow=True, bbox_to_anchor=(1, 1))
+    #plt.xlabel('Coercive field [V/nm]')
+    #plt.ylabel('Spontaneous polarization [nC/m]')
+    #plt.tight_layout()
+    #plt.savefig('Coercive_field_polarization_scatterplot.png')
+    #plt.savefig('Coercive_field_polarization_scatterplot.pdf')

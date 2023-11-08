@@ -1,0 +1,23 @@
+
+Tabulate Latex:
+\begin{tabular}{}
+\hline
+ Name   & Spacegroup   & P\$\_\{\textbackslash{}parallel\}\$ \$[\textbackslash{}text\{pC\}/\textbackslash{}text\{m\}]\$   & P\$\_\{\textbackslash{}perp\}\$ \$[\textbackslash{}text\{pC\}/\textbackslash{}text\{m\}]\$   & \$\textbackslash{}Delta\textbackslash{}text\{E\}\$ \$[\textbackslash{}text\{meV\}/\textbackslash{}text\{Å\}\^{}2]\$   & \$\textbackslash{}mathcal\{E\}\_\{\textbackslash{}text\{c\}\}\$ \$[\textbackslash{}text\{V\}/\textbackslash{}text\{nm\}]\$   & Gap [eV]   & \$\textbackslash{}omega\$ \$[\textbackslash{}text\{meV\}]\$   & EH \$[\textbackslash{}text\{eV\}/\textbackslash{}text\{atom\}]\$   & ID   \\
+\hline
+\hline
+\end{tabular}
+
+Texttable Latex:
+\begin{table}
+	\begin{center}
+		\begin{tabular}{c|c|c|c|c|c|c|c|c|c}
+			Name & Spacegroup & P$_{\parallel}$ $[\text{pC}/\text{m}]$ & P$_{\perp}$ $[\text{pC}/\text{m}]$ & $\Delta\text{E}$ $[\text{meV}/\text{Å}^2]$ & $\mathcal{E}_{\text{c}}$ $[\text{V}/\text{nm}]$ & Gap [eV] & $\omega$ $[\text{meV}]$ & EH $[\text{eV}/\text{atom}]$ & ID \\
+			\hline
+		\end{tabular}
+	\end{center}
+	\caption{The table contains materials which have polarization components in all three dimensions. 
+        The columns show material names, spacegroups, in plane spontaneous polarization, out of plane spontaneous polarization, energy difference 
+        between the polar and the non-polar structure, coercive fields, band gaps in the polar structure, phonon energies of the lowest phonon mode at the
+        $\Gamma$-point of the non-polar structure, energy above convex hull and finally the ICSD or COD id.}
+	\label{tab:mixed}
+\end{table}

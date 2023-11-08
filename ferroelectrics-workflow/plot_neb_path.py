@@ -1,0 +1,67 @@
+from pathlib import Path
+import os, re
+import matplotlib.pyplot as plt
+import numpy as np
+from ase.io.trajectory import Trajectory
+from ase.io import read
+from asr.core import read_json
+
+def get_paths(folder):
+
+    energies = []
+    pos = []
+
+    x = 16
+    x = x + 2
+    images = read(f'{folder}/neb_path.traj@-{x}:')
+    for atom in images:
+        calc = atom.get_calculator()
+        energies.append(calc.get_potential_energy())
+        pos.append(atom.get_positions())
+
+    x = 18
+    dist = []
+    total_dist = np.linalg.norm(pos[-1] - pos[0])
+    for i in np.arange(0,x):
+        dist.append(np.linalg.norm((pos[i]-pos[0])))
+        
+    path_points = np.array(dist)/total_dist
+    energies = energies[-18:]
+    #path_points = np.linspace(0,1,18)
+    #print(neb_path)
+    #print(path_points)
+
+    return energies, path_points
+
+if __name__ == "__main__":
+    from argparse import ArgumentParser
+    parser = ArgumentParser()
+    parser.add_argument("folders", nargs="*", help="Monolayer folders to analyse.")
+
+    args = parser.parse_args()
+    
+    if len(args.folders) > 0:
+        folders = [Path(x).absolute() for x in args.folders]
+    else:
+        folders = [Path(".").absolute()]
+
+    plt.rcParams['font.family'] = 'serif'
+    plt.rcParams['font.serif'] = ['Times New Roman'] + plt.rcParams['font.serif']
+
+    for folder in folders:
+        mat_name = re.split('[/]', str(folder))[-1]
+        if os.path.exists(f'{folder}/results-asr.polarization_path2.json'):
+            energypath, path_points = get_paths(folder) 
+    
+            path_points = np.linspace(-1,1,18)
+            zero_point_energy = energypath[0]
+            energypath = [x-zero_point_energy for x in energypath]
+            plt.figure()
+            plt.plot(path_points, energypath, '-ro')
+            plt.xlabel('$\lambda$')
+            plt.ylabel('Energy [eV]')
+            plt.title(f'Energy Curve: {mat_name}')
+
+            plt.tight_layout()
+            os.chdir(folder)
+            plt.savefig('neb_curve.png')

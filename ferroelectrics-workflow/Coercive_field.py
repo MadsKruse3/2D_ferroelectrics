@@ -156,7 +156,9 @@ if __name__ == "__main__":
                             Coercive_fields_FM.append(Coercive_field)
                             Coercive_fields_NEB_FM.append(Coercive_field_NEB)
 
-    os.chdir('/home/niflheim/madkru/2D_Ferroelectrics/')
+    cwd = os.getcwd()
+    os.chdir(cwd + '/plots_and_figures')
+    
     plt.rcParams['font.family'] = 'serif'
     plt.rcParams['font.serif'] = ['Times New Roman'] + plt.rcParams['font.serif']
     

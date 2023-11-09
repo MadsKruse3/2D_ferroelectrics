@@ -1,16 +1,19 @@
 from pathlib import Path
 import os, re
+
 import matplotlib.pyplot as plt
 import numpy as np
-from ase.io import read, iread
+
 from gpaw import GPAW
-from ase.phonons import Phonons
-from ase.spacegroup import get_spacegroup, Spacegroup
+
 from asr.core import read_json
 from asr.utils.symmetry import atoms2symmetry
+
+from ase.phonons import Phonons
+from ase.spacegroup import get_spacegroup, Spacegroup
 from ase.units import kB, kJ
-from evgraf import find_inversion_symmetry
 from ase.io.trajectory import TrajectoryWriter
+from ase.io import read, iread
 
 def get_polarization_direction(folder):
     polarpointgroups1 = ['1', '2', 'm', 'mm2']

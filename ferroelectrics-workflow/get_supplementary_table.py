@@ -263,8 +263,9 @@ if __name__ == "__main__":
     number_of_materials = []
     
     original_stdout = sys.stdout
-    os.chdir("/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures")    
-
+    cwd = os.getcwd()
+    os.chdir(cwd + '/plots_and_figures')
+    
     with open('supplementary_materials.txt', 'w') as f1:        
         rows = []
         row = []

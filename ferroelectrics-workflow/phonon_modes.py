@@ -388,8 +388,9 @@ if __name__ == "__main__":
     print('Proper Ferroelectric:', len(proper_ferroelectric))
     print('Other Ferroelectric:', len(other_ferroelectric))
     print('Metastable:', len(metastable))
-    
-    os.chdir('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/')
+
+    cwd = os.getcwd()
+    os.chdir(cwd + '/plots_and_figures')
 
     plt.rcParams['font.family'] = 'serif'
     plt.rcParams['font.serif'] = ['Times New Roman'] + plt.rcParams['font.serif']

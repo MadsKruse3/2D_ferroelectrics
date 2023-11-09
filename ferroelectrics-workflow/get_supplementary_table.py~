@@ -288,7 +288,8 @@ if __name__ == "__main__":
                         
                         structure_data = read_json(f"{folder}/results-asr.structureinfo.json")
                         name = structure_data["formula"]
-                        
+                        name = get_proper_chemical_symbols(name)
+
                         pos = atom.get_positions()
                         symbols = atom.get_chemical_symbols()
                         symbols = get_symbolic_numbers(symbols)

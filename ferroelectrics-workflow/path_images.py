@@ -1,6 +1,10 @@
+"""Check path images generated along switching path."""
+
 import numpy as np
+
 from ase.io import read
 from ase.io.trajectory import Trajectory
+
 from evgraf import find_inversion_symmetry
 
 ## Full gs calculation needed. The forces on all atoms in these structures must be known.
@@ -22,12 +26,8 @@ p3 = p2 - p1
 
 images = Trajectory('structures.traj', mode='w')
 
-for x in path_points_array:
-        
+for x in path_points_array:     
         p4 = p1 + p3*x
         
         atoms_polar.set_positions(p4)
         images.write(atoms_polar)
-
-        #E.append(atoms_non_polar.get_potential_energy())
-        #calc.write(f'structure_{x}.gpw', mode='all')

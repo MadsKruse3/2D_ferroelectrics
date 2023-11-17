@@ -24,12 +24,10 @@ from asr.core import read_json, chdir, write_json
 
 import numpy as np
 import os
-from evgraf import find_inversion_symmetry
 from pathlib import Path
 
 from ase.io import read
-
-VERBOSE = os.environ.get('MQVERBOSE', False)
+from evgraf import find_inversion_symmetry
 
 def neb_path(folder):
     tasks = []
@@ -228,7 +226,6 @@ def create_tasks():
                 tasks += polarization_path2(folder)
     return tasks
   
-
 if __name__ == '__main__':
     tasks = create_tasks()
     

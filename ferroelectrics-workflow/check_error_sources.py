@@ -1,7 +1,6 @@
 from pathlib import Path
-import os, re, logging
+import os, logging
 import numpy as np
-import matplotlib.pyplot as plt
 
 from asr.core import read_json
 from asr.utils.symmetry import atoms2symmetry
@@ -168,35 +167,27 @@ def check_polarization_errors(folder):
             error_lines = []
             for line in read_obj:
                 if 'assert np.all(kpt.f_n[:nocc] > 1e-6' in line:
-                    read_obj.close()
                     return 'state is metallic'
               
                 if 'assert np.allclose(M, calc.get_magnetic_moment(), atol=0.05)' in line:
-                    read_obj.close()
                     return 'state is metallic'
     
                 if 'assert np.allclose(np.sum(nocc_s), nvalence' in line:
-                    read_obj.close()
                     return 'state is metallic'
 
                 if 'Check if the polarization along the a axis has discontinuity' in line:
-                    read_obj.close()
                     return 'discontinuous polarization path'
                  
                 if 'Check if the polarization along the b axis has discontinuity' in line:
-                    read_obj.close()
                     return 'discontinuous polarization path'
                  
                 if 'Check if the polarization along the c axis has discontinuity' in line:
-                    read_obj.close()
                     return 'discontinuous polarization path'
                  
                 if 'gpaw.KohnShamConvergenceError: Did not converge!' in line:
-                    read_obj.close()
                     return 'One of the DFT calculations did not converge'
 
             return 'Some other error is present' 
-        read_obj.close()
     return []
 
 def check_relaxation_errors(folder):
@@ -216,23 +207,18 @@ def check_relaxation_errors(folder):
             error_lines = []
             for line in read_obj:
                 if 'gpaw.KohnShamConvergenceError: Did not converge!' in line:
-                    read_obj.close()
                     return 'One of the DFT calculations did not converge'
                     
                 if 'gpaw.utilities.AtomsTooClose: Atoms are too close' in line:
-                    read_obj.close()
                     return 'Atoms too close to each other'
                 
                 if 'ValueError: Some atom is too close to the zero-boundary!' in line:
-                    read_obj.close()
                     return 'Atoms too close to zero boundary'
 
                 if 'RuntimeError: Broken symmetry!' in line:
-                    read_obj.close()
                     return 'Broken Symmetry'
             
             return 'Some other error is present' 
-        read_obj.close()
     return []
 
 def check_neb_path_errors(folder):
@@ -253,19 +239,15 @@ def check_neb_path_errors(folder):
                 error_lines = []
                 for line in read_obj:
                     if 'gpaw.KohnShamConvergenceError: Did not converge!' in line:
-                        read_obj.close()
                         return 'One of the DFT calculations did not converge'
                     
                     if 'slurmstepd: error: *** JOB' in line:
-                        read_obj.close()
                         return 'TIMEOUT error'
   
                     if 'ValueError: Images have different boundary conditions' in line:
-                        read_obj.close()
                         return 'boundary error'
               
                     if 'RuntimeError: Parallel NEB failed!' in line:
-                        read_obj.close()
                         return 'Parallel NEB failed!'
 
                 return 'Some other error is present' 

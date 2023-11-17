@@ -1,4 +1,4 @@
-""" Script used to generate Table IV in https://arxiv.org/abs/2209.13911"""
+""" Script used to generate Table IV in https://www.nature.com/articles/s41524-023-00999-5"""
 
 from pathlib import Path
 import os, re, sys, latextable

@@ -1,10 +1,10 @@
+""" Script used to generate figure 5 in https://www.nature.com/articles/s41524-023-00999-5"""
+
 from pathlib import Path
 import os, re
 
 import matplotlib.pyplot as plt
 import numpy as np
-
-from gpaw import GPAW
 
 from asr.core import read_json
 from asr.utils.symmetry import atoms2symmetry

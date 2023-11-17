@@ -1,3 +1,4 @@
+
 from pathlib import Path
 import os, re
 
@@ -7,10 +8,9 @@ import numpy as np
 from asr.core import read_json
 
 from ase.io import read
-from ase.units import _e 
+from ase.units import _e
 
 def plot_displaced_paths(folder):
-
     atoms_polar = read('structure.json')
     
     cell_vc = (atoms_polar.get_cell().T) * 1e-10

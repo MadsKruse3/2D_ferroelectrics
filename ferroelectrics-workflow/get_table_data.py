@@ -1,6 +1,5 @@
-"""Script that produces Tables I II III in https://arxiv.org/abs/2209.13911"""
+"""Script that produces Tables 1 and 3 in https://www.nature.com/articles/s41524-023-00999-5"""
 
-from ase.phonons import Phonons
 from pathlib import Path
 import os, re, sys, latextable
 import matplotlib.pyplot as plt
@@ -12,10 +11,10 @@ from asr.utils.symmetry import atoms2symmetry
 from ase.io import read
 from ase.units import kJ
 from ase.phonons import Phonons
+from ase.phonons import Phonons
 
 from tabulate import tabulate
 from texttable import Texttable
-from asr.utils.symmetry import atoms2symmetry
 
 def verify_neb(folder):
     data1 = read_json(f"{folder}/results-asr.polarization_path.json")

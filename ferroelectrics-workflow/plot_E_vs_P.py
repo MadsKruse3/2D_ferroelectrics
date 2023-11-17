@@ -1,9 +1,12 @@
+"""Script to generate a plot of Energy as a function of Polarization for a given material."""
 from pathlib import Path
 import os, re
-from asr.core import read_json
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
+
 from ase.io import read
+
+from asr.core import read_json
 
 def plot_paths(folder):
     dpath = f'{folder}/results-asr.polarization_path.json'
@@ -100,7 +103,3 @@ if __name__ == "__main__":
             plt.tight_layout()
             plt.savefig('Energy_vs_polarization_both.png')
             plt.close()
-
-                
-            
-

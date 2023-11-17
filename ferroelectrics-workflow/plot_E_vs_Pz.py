@@ -1,9 +1,12 @@
+"""Plot energy as a function of the polarization component along the z-axis."""
 from pathlib import Path
 import os, re
-from asr.core import read_json
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
+
 from ase.io import read
+
+from asr.core import read_json
 
 def plot_paths(folder):
     dpath = f'{folder}/results-asr.polarization_path.json'
@@ -85,7 +88,7 @@ if __name__ == "__main__":
             plt.legend(['Linear interpolation'])
             plt.title(f'Energy as a function of polarization: {mat_name}')
             plt.tight_layout()
-            plt.savefig('Energy_vs_polarization_z.png')
+            plt.savefig('Energy_vs_polarization_z.pdf')
             plt.close()
 
         if os.path.exists(f'{folder}/results-asr.polarization_path2.json'):
@@ -101,7 +104,7 @@ if __name__ == "__main__":
             plt.legend(['NEB'])
             plt.title(f'Energy as a function of polarization: {mat_name}')
             plt.tight_layout()
-            plt.savefig('Energy_vs_polarization_z_both.png')
+            plt.savefig('Energy_vs_polarization_z_both.pdf')
             plt.close()
 
                 

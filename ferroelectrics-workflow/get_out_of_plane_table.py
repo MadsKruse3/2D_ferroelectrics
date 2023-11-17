@@ -1,17 +1,22 @@
-from ase.phonons import Phonons
+"""Generates table 2 for out of plane materials found in https://www.nature.com/articles/s41524-023-00999-5"""
+
 from pathlib import Path
-import os, re, sys, latextable
-from asr.core import read_json
-import matplotlib.pyplot as plt
+import os, re, sys
 import numpy as np
+import matplotlib.pyplot as plt
+
+from asr.utils.symmetry import atoms2symmetry
+from asr.core import read_json
+
 from ase.io import read
-from evgraf import find_inversion_symmetry
 from ase.units import kJ
+from ase.phonons import Phonons
+
+from evgraf import find_inversion_symmetry
+
 from tabulate import tabulate
 from texttable import Texttable
-from asr.utils.symmetry import atoms2symmetry
-import math
-from fractions import Fraction
+import latextable
 
 def verify_neb(folder):
     data1 = read_json(f"{folder}/results-asr.polarization_path.json")

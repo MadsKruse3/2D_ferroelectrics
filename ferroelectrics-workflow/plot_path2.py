@@ -187,6 +187,3 @@ if __name__ == "__main__":
             plt.ylabel('Polarization')
             #plt.title(f'Polarization in c-direction: {mat_name}')
             plt.savefig(f'Polarization_c_{mat_name}.pdf')
-
-            
-            

@@ -6,7 +6,7 @@ from asr.core import read_json
 from ase.units import kJ
 
 def get_gradients(folder):
-
+    """ Computes Coercive field as from the energy gradient from linear interpolation (LI) calculations."""
     atom = read(f'{folder}/structure.json')
     n = len(atom)
     cell_vc = atom.get_cell().T*1e-10
@@ -43,7 +43,7 @@ def get_gradients(folder):
     return Coercive_field, Polarization
 
 def get_gradients_NEB(folder):
-
+    """ Computes Coercive field as from the energy gradient from Nudged Elastic Band (NEB) calculations."""
     atom = read(f'{folder}/structure.json')
     n = len(atom)
     #cell_vc = atom.get_cell().T
@@ -82,6 +82,7 @@ def get_gradients_NEB(folder):
     return Coercive_field_NEB, Polarization
 
 def verify_polarization(folder):
+    """Verify that the polarization curve is smooth."""
     data = read_json(f"{folder}/results-asr.polarization_path.json")
     Pa = data["Pa_path"]
     Pb = data["Pb_path"]
@@ -106,6 +107,7 @@ def verify_polarization(folder):
     return True
 
 if __name__ == "__main__":
+    """ Creates scatterplots that compare Coercive fields (where they are well defined) against spontaneous polarizations."""
     from pathlib import Path
     from argparse import ArgumentParser
     parser = ArgumentParser()
@@ -171,9 +173,8 @@ if __name__ == "__main__":
     plt.ylabel('Spontaneous polarization [nC/m]')
     plt.title('Coercive field - polarization scatterplot')
     plt.tight_layout()
-    #plt.savefig('Polarization_vs_coercive_field.png')
-    
-                       
+    plt.savefig('Polarization_vs_coercive_field.pdf')
+     
     plt.figure()
     l1 = plt.scatter(Coercive_fields_NEB, Pols, c='b', alpha=0.5)
     l2 = plt.scatter(Coercive_fields_NEB_FM, Pols_FM, c = 'red', alpha=0.5)
@@ -184,7 +185,7 @@ if __name__ == "__main__":
     plt.ylabel('Polarization [nC/m]')    
     plt.title('Polarization vs Coercive field')
     plt.tight_layout()
-    #plt.savefig('Polarization_vs_coercive_field_NEB.png')
+    plt.savefig('Polarization_vs_coercive_field_NEB.pdf')
     #plt.show()
 
     plt.figure()
@@ -198,5 +199,4 @@ if __name__ == "__main__":
     plt.ylabel('Coercive field from NEB [V/nm]')    
     plt.title('Compare Coercive fields')
     plt.tight_layout()
-    #plt.savefig('Compare_coercive_fields.png')
-    #plt.show()
+    plt.savefig('Compare_coercive_fields.pdf')

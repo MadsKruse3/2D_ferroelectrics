@@ -1,11 +1,15 @@
 import numpy as np
-import re, sys, os
-from ase.io import read
-from evgraf import find_inversion_symmetry
+import os
 import matplotlib.pyplot as plt
-from asr.core import read_json
+
 from ase.units import kJ
+from ase.io import read
+
+from asr.core import read_json
 from asr.utils.symmetry import atoms2symmetry
+
+"""Script that collects data and makes the plot found in figure 6 in:
+https://www.nature.com/articles/s41524-023-00999-5#article-info """
 
 def get_polarization_direction(folder):
     polarpointgroups1 = ['1', '2', 'm', 'mm2']
@@ -194,14 +198,9 @@ if __name__ == "__main__":
                         Pols_3D.append(pol[2])
                         Energy_pr_area_3D.append(Ediff_pr_area)
 
-                    #if f"{folder}" == "/home/niflheim/madkru/2D_Ferroelectrics/tree/AB/GeS/Ge2S2-ecbb7c185669":
-                    #    Pol_GeS.append(pol)
-                    #    Energy_pr_cell_GeS.append(Ediff_pr_cell)
-                    #    #Coercive_field_GeS.append(Coercive_field)
-
-                    
+    cwd = os.getcwd()
+    os.chdir(cwd + '/plots_and_figures')
     
-    os.chdir('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/')
     plt.rcParams['font.family'] = 'serif'
     plt.rcParams['font.serif'] = ['Times New Roman'] + plt.rcParams['font.serif']
     plt.rcParams['axes.labelsize'] = 'large'

@@ -188,8 +188,6 @@ def check_gaps(folder):
     if not 'No gap' in gaps:
         return True
 
-
-
 def sort_folders_by_spacegroup(folders):
     spacegroups = []
     for folder in folders:
@@ -337,6 +335,3 @@ if __name__ == "__main__":
     f1.close()
     
 print(len(number_of_materials))
-
-
-    

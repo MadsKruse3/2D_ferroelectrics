@@ -1,10 +1,10 @@
-from gpaw import GPAW
 import numpy as np
-import json
-from evgraf import find_inversion_symmetry
-import glob, os, sys
+import os
 from pathlib import Path
+
 from ase.io import read, write
+
+from evgraf import find_inversion_symmetry
 
 def unwrap_structure(folder):
     """ Recipe that: 

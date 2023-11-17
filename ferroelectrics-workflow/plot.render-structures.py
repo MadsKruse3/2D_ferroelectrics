@@ -9,7 +9,10 @@ from pathlib import Path
 from argparse import ArgumentParser
 
 if __name__ == "__main__":
-
+    """Template for how to render structure. 
+    The actual script used to generate figures for 
+    the paper can be found in visualize_structure.py"""
+    
     parser = ArgumentParser()
     parser.add_argument("folders", nargs="*", help="Monolayer folders to analyse.")
 

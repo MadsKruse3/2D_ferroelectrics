@@ -1,13 +1,18 @@
 from pathlib import Path
-import os, re
-from asr.core import read_json
-import matplotlib.pyplot as plt
+import os, re, logging
 import numpy as np
+import matplotlib.pyplot as plt
+
+from asr.core import read_json
 from ase.io import read
 from gpaw import GPAW
 from evgraf import find_inversion_symmetry
 
 def check_gaps(folder):
+    """Check structure files for gaps. 
+    (This is only neccesary if an old version 
+    of gpaw is used where a finite gap requirement
+    is not explicitly enforced in the berryphase recipe.)"""
     lambdas = np.linspace(0, 1, 15)
     gaps = []
     for x in lambdas:
@@ -28,10 +33,14 @@ def check_gaps(folder):
                     gap = newline
                     gaps.append(gap)
 
-        read_obj.close()
     return gaps
 
 def verify_polarization(folder):
+    """Check that the material actually has a finite polarization. 
+    If the result is tiny it is an indicator that
+    the material is not relaxed properly or that a 
+    finer tolerance factor is needed for the symmetry analysis"""
+    
     data = read_json(f"{folder}/results-asr.polarization_path.json")
     Pa = data["Pa_path"]
     Pb = data["Pb_path"]
@@ -49,6 +58,7 @@ def verify_polarization(folder):
     return True
 
 def check_monotonicity(folder):
+    """Check wheter or not the polarization monotonically increases"""
     data = read_json(f"{folder}/results-asr.polarization_path.json")
     Px = data["Px_path"]
     Py = data["Py_path"]
@@ -64,33 +74,20 @@ def check_monotonicity(folder):
             continue
     return True
 
-
-def check_gs(folder):
-    dpath = f'{folder}/centrosymmetric_structure/gs.txt'
-    lines = []
-    with open(dpath, 'r') as read_obj:                
-        for line in read_obj:
-            line = line.strip()
-            lines.append(line)
-            if 'Gap' in line:
-                newline = str(str(line).split("(")[-1]).split(",")[-1]
-                newline = str(newline).split(")")[-1]
-                gap = newline
-                #gaps.append(gap)
-                
-            if 'No gap' in line:
-                newline = str(str(line).split("(")[-1]).split(",")[-1]
-                gap = newline
-                #gaps.append(gap)
-
-    read_obj.close()
-    return gap
-
 if __name__ == "__main__":
     from argparse import ArgumentParser
+    """Check wheter materials have bandgaps or not."""
+
+    logging.basicConfig(level=logging.INFO, 
+    format='[%(asctime)s] %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),  # Log to console
+        logging.FileHandler('bandgaps.log')  # Log to file
+    ])
+    logger = logging.getLogger(__name__)
+
     parser = ArgumentParser()
     parser.add_argument("folders", nargs="*", help="Monolayer folders to analyse.")
-
     args = parser.parse_args()
     
     if len(args.folders) > 0:
@@ -104,24 +101,20 @@ if __name__ == "__main__":
         if os.path.exists(f"{folder}/results-asr.polarization_path.json"):
             if verify_polarization(folder):
                 gaps = check_gaps(folder)
-                #gap = check_gs(folder)
-                print(gaps)
+                gap = check_gs(folder)
                 if 'No gap' in gaps:
                     print(f"{folder}:", gaps)
                     if os.path.exists(f"{folder}/centrosymmetric_structure/results-asr.gs.json"):
                         gap = check_gs(folder)
-                        #print(gap)
                     no_gap_materials.append(folder)
-                    #print(f'{folder}:', gaps)
                 if not 'No gap' in gaps:
                     if check_monotonicity(folder):
                         gapped_materials.append(folder)
-                        
-                #if 'No gap' in gaps[-1]:
-                #    print(folder)
-                #    print(gaps)
-    print('Gapped materials:', len(gapped_materials))
-    print('Non-gapped materials:', len(no_gap_materials))
+
+    logger.info('Gapped materials:', len(gapped_materials))
+    logger.info('Non-gapped materials:', len(no_gap_materials))                        
+    #print('Gapped materials:', len(gapped_materials))
+    #print('Non-gapped materials:', len(no_gap_materials))
   
     
 

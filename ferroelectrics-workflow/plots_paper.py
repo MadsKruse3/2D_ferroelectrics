@@ -1,7 +1,5 @@
 from pathlib import Path
-import os, re
-
-import matplotlib.pyplot as plt
+import os
 import numpy as np
 
 from ase.io import read
@@ -9,6 +7,10 @@ from asr.core import read_json
 
 from matplotlib.offsetbox import TextArea, DrawingArea, OffsetImage, AnnotationBbox
 import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
+
+"""Polarization path plots presented in figures 3 and 4 in:
+https://www.nature.com/articles/s41524-023-00999-5#article-info"""
 
 def plot_polarizations(folder):
     os.chdir(folder)
@@ -88,7 +90,6 @@ def plot_paths(folder):
     energypath = np.array(energypath)/A
         
     return energypath, path_points, path_x, path_y, path_z, path_a, path_b, path_c
-
 
 def plot_neb_path(folder):
     os.chdir(folder)
@@ -172,7 +173,6 @@ if __name__ == "__main__":
     else:
         folders = [Path(".").absolute()]
 
-
     plt.rcParams['font.family'] = 'serif'
     plt.rcParams['font.serif'] = ['Times New Roman'] + plt.rcParams['font.serif']
     plt.rcParams['axes.labelsize'] = 'large'
@@ -182,16 +182,22 @@ if __name__ == "__main__":
     plt.rcParams['legend.handlelength'] = 0.8                                                                                                                                                                    
     plt.rcParams['legend.handletextpad'] =  0.6   
 
-    if os.path.exists('/home/niflheim/madkru/2D_Ferroelectrics/tree/AB/GeS/Ge2S2-ecbb7c185669/results-asr.polarization_path2.json'):
+    cwd = os.getcwd()
+    #if os.path.exists('/home/niflheim/madkru/2D_Ferroelectrics/tree/AB/GeS/Ge2S2-ecbb7c185669/results-asr.polarization_path2.json'):
+    if os.path.exists(cwd + '/tree/AB/GeS/Ge2S2-ecbb7c185669/results-asr.polarization_path2.json'):
 
-        energy_path, polarization_path = E_vs_P('/home/niflheim/madkru/2D_Ferroelectrics/tree/AB/GeS/Ge2S2-ecbb7c185669') 
-        energy_path_neb, polarization_path_neb = E_vs_P_NEB('/home/niflheim/madkru/2D_Ferroelectrics/tree/AB/GeS/Ge2S2-ecbb7c185669') 
+        #energy_path, polarization_path = E_vs_P('/home/niflheim/madkru/2D_Ferroelectrics/tree/AB/GeS/Ge2S2-ecbb7c185669') 
+        #energy_path_neb, polarization_path_neb = E_vs_P_NEB('/home/niflheim/madkru/2D_Ferroelectrics/tree/AB/GeS/Ge2S2-ecbb7c185669') 
+        energy_path, polarization_path = E_vs_P(cwd + '/tree/AB/GeS/Ge2S2-ecbb7c185669') 
+        energy_path_neb, polarization_path_neb = E_vs_P_NEB(cwd + '/tree/AB/GeS/Ge2S2-ecbb7c185669')
 
         fig, ax = plt.subplots()
-        arr_lena = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Ge2S2nonpolarinset.png')
+        #arr_lena = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Ge2S2nonpolarinset.png') 
+        arr_lena = mpimg.imread(cwd + '/plots_and_figures/Ge2S2nonpolarinset.png')
         imagebox = OffsetImage(arr_lena, zoom=0.65)
         ab = AnnotationBbox(imagebox, (80, 3), frameon=False)
-        arr_lena2 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Ge2S2polarinset.png')
+        #arr_lena2 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Ge2S2polarinset.png')
+        arr_lena2 = mpimg.imread(cwd + '/plots_and_figures/Ge2S2polarinset.png')
         imagebox2 = OffsetImage(arr_lena2, zoom=0.65)
         ab2 = AnnotationBbox(imagebox2, (405, 27.5), frameon=False)
         ax.text(200, 2.35, 'Ge$_{2}$S$_{2}$', fontdict=None, fontsize=28)
@@ -203,22 +209,25 @@ if __name__ == "__main__":
         ax.add_artist(ab)
         ax.add_artist(ab2)
         fig.tight_layout()
-        
-        fig.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/E_vs_P_with_insert_Ge2S2-ecbb7c185669.png')
-        fig.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/E_vs_P_with_insert_Ge2S2-ecbb7c185669.pdf')
+        #fig.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/E_vs_P_with_insert_Ge2S2-ecbb7c185669.png')
+        #fig.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/E_vs_P_with_insert_Ge2S2-ecbb7c185669.pdf')
+        fig.savefig(cwd + '/plots_and_figures/E_vs_P_with_insert_Ge2S2-ecbb7c185669.pdf')
         plt.close()
 
-    if os.path.exists('/home/niflheim/madkru/2D_Ferroelectrics/tree/AB2/InTe2/In2Te4-3d54cc8ff54d/results-asr.polarization_path2.json'):
-                
-        energy_path, polarization_path = E_vs_P('/home/niflheim/madkru/2D_Ferroelectrics/tree/AB2/InTe2/In2Te4-3d54cc8ff54d') 
-        energy_path_neb, polarization_path_neb = E_vs_P_NEB('/home/niflheim/madkru/2D_Ferroelectrics/tree/AB2/InTe2/In2Te4-3d54cc8ff54d') 
-        
-        
+    #if os.path.exists('/home/niflheim/madkru/2D_Ferroelectrics/tree/AB2/InTe2/In2Te4-3d54cc8ff54d/results-asr.polarization_path2.json'):
+    if os.path.exists(cwd + '/tree/AB2/InTe2/In2Te4-3d54cc8ff54d/results-asr.polarization_path2.json'):
+        #energy_path, polarization_path = E_vs_P('/home/niflheim/madkru/2D_Ferroelectrics/tree/AB2/InTe2/In2Te4-3d54cc8ff54d')
+        #energy_path_neb, polarization_path_neb = E_vs_P_NEB('/home/niflheim/madkru/2D_Ferroelectrics/tree/AB2/InTe2/In2Te4-3d54cc8ff54d')
+        energy_path, polarization_path = E_vs_P(cwd + '/tree/AB2/InTe2/In2Te4-3d54cc8ff54d') 
+        energy_path_neb, polarization_path_neb = E_vs_P_NEB(cwd + '/tree/AB2/InTe2/In2Te4-3d54cc8ff54d') 
+
         fig, ax = plt.subplots()
-        arr_lena = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/In2Te4nonpolar.png')
+        #arr_lena = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/In2Te4nonpolar.png')
+        arr_lena = mpimg.imread(cwd + '/plots_and_figures/In2Te4nonpolar.png')
         imagebox = OffsetImage(arr_lena, zoom=0.05)
         ab = AnnotationBbox(imagebox, (15, 2.8), frameon=False)
-        arr_lena2 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/In2Te4polar.png')
+        #arr_lena2 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/In2Te4polar.png')
+        arr_lena2 = mpimg.imread(cwd + '/plots_and_figures/In2Te4polar.png')
         imagebox2 = OffsetImage(arr_lena2, zoom=0.05)
         ab2 = AnnotationBbox(imagebox2, (240, 2.8), frameon=False)
         ax.text(195, 5, 'In$_{2}$Te$_{4}$', fontdict=None, fontsize=28)
@@ -229,23 +238,26 @@ if __name__ == "__main__":
         ax.legend(['LI', 'NEB'], loc='upper left')
         ax.add_artist(ab)
         ax.add_artist(ab2)
-        fig.tight_layout()
-                
-        fig.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/E_vs_P_with_insert_In2Te4-3d54cc8ff54d.png')
-        fig.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/E_vs_P_with_insert_In2Te4-3d54cc8ff54d.pdf')
+        fig.tight_layout()    
+        #fig.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/E_vs_P_with_insert_In2Te4-3d54cc8ff54d.png')
+        #fig.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/E_vs_P_with_insert_In2Te4-3d54cc8ff54d.pdf')
+        fig.savefig(cwd + '/plots_and_figures/E_vs_P_with_insert_In2Te4-3d54cc8ff54d.pdf')
         plt.close()
                 
-    if os.path.exists('/home/niflheim/madkru/2D_Ferroelectrics/tree/ABC/FLiS/F2Li2S2-46174a65d380/results-asr.polarization_path2.json'):
-                
-        energy_path, polarization_path = E_vs_P('/home/niflheim/madkru/2D_Ferroelectrics/tree/ABC/FLiS/F2Li2S2-46174a65d380') 
-        energy_path_neb, polarization_path_neb = E_vs_P_NEB('/home/niflheim/madkru/2D_Ferroelectrics/tree/ABC/FLiS/F2Li2S2-46174a65d380') 
-        
-        fig, ax = plt.subplots()
+    #if os.path.exists('/home/niflheim/madkru/2D_Ferroelectrics/tree/ABC/FLiS/F2Li2S2-46174a65d380/results-asr.polarization_path2.json'):
+    if os.path.exists(cwd + '/tree/ABC/FLiS/F2Li2S2-46174a65d380/results-asr.polarization_path2.json'):
+        #energy_path, polarization_path = E_vs_P('/home/niflheim/madkru/2D_Ferroelectrics/tree/ABC/FLiS/F2Li2S2-46174a65d380') 
+        #energy_path_neb, polarization_path_neb = E_vs_P_NEB('/home/niflheim/madkru/2D_Ferroelectrics/tree/ABC/FLiS/F2Li2S2-46174a65d380') 
+        energy_path, polarization_path = E_vs_P(cwd + '/tree/ABC/FLiS/F2Li2S2-46174a65d380') 
+        energy_path_neb, polarization_path_neb = E_vs_P_NEB(cwd + '/tree/ABC/FLiS/F2Li2S2-46174a65d380') 
 
-        arr_lena = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/F2Li2S2nonpolar0x0y.png')
+        fig, ax = plt.subplots()
+        #arr_lena = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/F2Li2S2nonpolar0x0y.png')
+        arr_lena = mpimg.imread(cwd + '/plots_and_figures/F2Li2S2nonpolar0x0y.png')
         imagebox = OffsetImage(arr_lena, zoom=0.06)
         ab = AnnotationBbox(imagebox, (10, 0.75), frameon=False)
-        arr_lena2 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/F2Li2S2polar0x0y.png')
+        #arr_lena2 = mpimg.imread('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/F2Li2S2polar0x0y.png')
+        arr_lena2 = mpimg.imread(cwd + '/plots_and_figures/F2Li2S2polar0x0y.png')
         imagebox2 = OffsetImage(arr_lena2, zoom=0.06)
         ab2 = AnnotationBbox(imagebox2, (105, 4), frameon=False)
         ax.set_xlabel('Polarization [pC/m]')
@@ -258,19 +270,20 @@ if __name__ == "__main__":
         ax.add_artist(ab2)
         fig.tight_layout()
                 
-        fig.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/E_vs_P_with_insert_F2Li2S2-46174a65d380.png')
-        fig.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/E_vs_P_with_insert_F2Li2S2-46174a65d380.pdf')
+        #fig.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/E_vs_P_with_insert_F2Li2S2-46174a65d380.png')
+        #fig.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/E_vs_P_with_insert_F2Li2S2-46174a65d380.pdf')
+        fig.savefig(cwd + '/plots_and_figures/E_vs_P_with_insert_F2Li2S2-46174a65d380.pdf')
         plt.close()
-
 
     plt.rcParams['font.family'] = 'serif'
     plt.rcParams['font.serif'] = ['Times New Roman'] + plt.rcParams['font.serif']
     plt.rcParams['axes.labelsize'] = 'large'
     plt.rcParams['font.size'] = 12
-    if os.path.exists('/home/niflheim/madkru/2D_Ferroelectrics/tree/A2B3/As2Se3/As4Se6-b8c4c860d745/results-asr.polarization_path2.json'):
-                
-        a, Pa, Pb, Pc  = plot_polarizations('/home/niflheim/madkru/2D_Ferroelectrics/tree/A2B3/As2Se3/As4Se6-b8c4c860d745') 
-        
+    
+    #if os.path.exists('/home/niflheim/madkru/2D_Ferroelectrics/tree/A2B3/As2Se3/As4Se6-b8c4c860d745/results-asr.polarization_path2.json'):
+    if os.path.exists(cwd + '/tree/A2B3/As2Se3/As4Se6-b8c4c860d745/results-asr.polarization_path2.json'):
+        #a, Pa, Pb, Pc  = plot_polarizations('/home/niflheim/madkru/2D_Ferroelectrics/tree/A2B3/As2Se3/As4Se6-b8c4c860d745') 
+        a, Pa, Pb, Pc  = plot_polarizations(cwd + '/tree/A2B3/As2Se3/As4Se6-b8c4c860d745')
         n=8
         ticks = np.linspace(-1,1,5)
         plt.figure()        
@@ -285,16 +298,15 @@ if __name__ == "__main__":
         plt.xlim([-1,1])
         plt.ylim([-4,4])
         plt.xticks(ticks)
-        plt.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Polarization_shifted_As4Se6-b8c4c860d745.png')
-        plt.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Polarization_shifted_As4Se6-b8c4c860d745.pdf')
+        #plt.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Polarization_shifted_As4Se6-b8c4c860d745.png')
+        #plt.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Polarization_shifted_As4Se6-b8c4c860d745.pdf')
+        plt.savefig(cwd + '/plots_and_figures/Polarization_shifted_As4Se6-b8c4c860d745.pdf')
         plt.close()
 
-        
-
-    if os.path.exists('/home/niflheim/madkru/2D_Ferroelectrics/tree/A2B3/As2Se3/As4Se6-b8c4c860d745/results-asr.polarization_path2.json'):
-                
-        a, Pa, Pb, Pc  = plot_polarizations('/home/niflheim/madkru/2D_Ferroelectrics/tree/A2B3/As2Se3/As4Se6-b8c4c860d745') 
-        
+    #if os.path.exists('/home/niflheim/madkru/2D_Ferroelectrics/tree/A2B3/As2Se3/As4Se6-b8c4c860d745/results-asr.polarization_path2.json'):
+    if os.path.exists(cwd + '/tree/A2B3/As2Se3/As4Se6-b8c4c860d745/results-asr.polarization_path2.json'):
+        #a, Pa, Pb, Pc  = plot_polarizations('/home/niflheim/madkru/2D_Ferroelectrics/tree/A2B3/As2Se3/As4Se6-b8c4c860d745') 
+        a, Pa, Pb, Pc  = plot_polarizations(cwd + '/tree/A2B3/As2Se3/As4Se6-b8c4c860d745') 
         n=8
         ticks = np.linspace(-1,1,5)
         plt.figure()        
@@ -371,23 +383,20 @@ if __name__ == "__main__":
                 plt.plot(a[22], Pa[n][22]-6, '-bo', linewidth=3)
                 plt.plot(a[28], Pa[n][28]-7, '-bo', linewidth=3)
                 
-
-
         plt.xlabel('$\lambda$')
         #plt.ylabel('Polarization [ea/V]')
         plt.ylabel('Polarization')
         plt.xlim([-1.1,1.1])
         plt.ylim([-4,4])
         plt.xticks(ticks)
-        #plt.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Polarization_shifted_thesis_As4Se6-b8c4c860d745.png')
-        plt.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Polarization_shifted_thesis_As4Se6-b8c4c860d745.pdf')
+        #plt.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Polarization_shifted_thesis_As4Se6-b8c4c860d745.pdf')
+        plt.savefig(cwd + '/plots_and_figures/Polarization_shifted_thesis_As4Se6-b8c4c860d745.pdf')
         plt.close()
 
-
-    if os.path.exists('/home/niflheim/madkru/2D_Ferroelectrics/tree/A2B3/As2Se3/As4Se6-b8c4c860d745/results-asr.polarization_path2.json'):
-                
-        a, Pa, Pb, Pc  = plot_polarizations('/home/niflheim/madkru/2D_Ferroelectrics/tree/A2B3/As2Se3/As4Se6-b8c4c860d745') 
-        
+    #if os.path.exists('/home/niflheim/madkru/2D_Ferroelectrics/tree/A2B3/As2Se3/As4Se6-b8c4c860d745/results-asr.polarization_path2.json'):
+    if os.path.exists(cwd + '/tree/A2B3/As2Se3/As4Se6-b8c4c860d745/results-asr.polarization_path2.json'):
+        #a, Pa, Pb, Pc  = plot_polarizations('/home/niflheim/madkru/2D_Ferroelectrics/tree/A2B3/As2Se3/As4Se6-b8c4c860d745') 
+        a, Pa, Pb, Pc  = plot_polarizations(cwd + '/tree/A2B3/As2Se3/As4Se6-b8c4c860d745')
         n=8
         ticks = np.linspace(-1,1,5)
         plt.figure()        
@@ -412,6 +421,6 @@ if __name__ == "__main__":
         plt.ylim([-4,4])
         plt.xticks(ticks)
         #plt.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Polarization_shifted_thesis2_update_As4Se6-b8c4c860d745.png')
-        plt.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Polarization_shifted_thesis2_As4Se6-b8c4c860d745.pdf')
+        #plt.savefig('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/Polarization_shifted_thesis2_As4Se6-b8c4c860d745.pdf')
+        plt.savefig(cwd + '/plots_and_figures/Polarization_shifted_thesis2_As4Se6-b8c4c860d745.pdf')
         plt.close()
-

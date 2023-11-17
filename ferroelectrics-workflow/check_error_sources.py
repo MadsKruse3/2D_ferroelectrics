@@ -1,15 +1,19 @@
 from pathlib import Path
-import os, re
-from asr.core import read_json
-import matplotlib.pyplot as plt
+import os, re, logging
 import numpy as np
-from ase.io import read
-from gpaw import GPAW
-from evgraf import find_inversion_symmetry
+import matplotlib.pyplot as plt
+
+from asr.core import read_json
 from asr.utils.symmetry import atoms2symmetry
 
+from ase.io import read
+
+from gpaw import GPAW
+
+from evgraf import find_inversion_symmetry
 
 def verify_neb(folder):
+    """Check to see if the polarizations from different Nudged Elastic Band (NEB) calculations are identical or not."""
     data1 = read_json(f"{folder}/results-asr.polarization_path.json")
     data2 = read_json(f"{folder}/results-asr.polarization_path2.json")
     P1 = data1["P_tot"]
@@ -30,6 +34,7 @@ def verify_neb(folder):
     return True
 
 def get_polarization_direction(folder):
+    """Get the direction of polarization for the polar materials."""
     polarpointgroups1 = ['1', '2', 'm', 'mm2']
     polarpointgroups2 = ['3', '3m', '4', '4mm', '6', '6mm']
     rotations = [[[1, 0, 0],
@@ -80,6 +85,8 @@ def get_polarization_direction(folder):
     return config, pol
 
 def get_pyroelectric_direction(folder):
+    """For the materials that are non-polar but 
+    still pyroeletric check the orientation of the polar axis."""
     polarpointgroups1 = ['1', '2', 'm', 'mm2']
     polarpointgroups2 = ['3', '3m', '4', '4mm', '6', '6mm']
     rotations = [[[1, 0, 0],
@@ -144,6 +151,7 @@ def check_gaps(folder):
     return gaps
 
 def check_polarization_errors(folder):
+    """Check the polarization calculations to see if there is any errors."""
     if os.path.exists(f"{folder}/asr.polarization_path.state"):
         list_of_files = os.listdir(f"{folder}")
         job_numbers = []
@@ -192,6 +200,7 @@ def check_polarization_errors(folder):
     return []
 
 def check_relaxation_errors(folder):
+    """Check the relaxation calculations to see if there is errors."""
     if not os.path.exists(f"{folder}/centrosymmetric_structure/result-asr.relax.json"):
         list_of_files = os.listdir(f"{folder}/centrosymmetric_structure")
         job_numbers = []
@@ -227,6 +236,7 @@ def check_relaxation_errors(folder):
     return []
 
 def check_neb_path_errors(folder):
+    """Check the Nudged Elastic Band (NEB) calculations."""
     if not os.path.exists(f"{folder}/result-asr.neb_path.json"):
         list_of_files = os.listdir(f"{folder}")
         job_numbers = []
@@ -262,6 +272,7 @@ def check_neb_path_errors(folder):
     return []
 
 def check_polar_symmetry(folder):
+    """Check wheter material is polar or not."""
     polar_pointgroups = [1, 2, 3, 4, 6, "m", "mm2", "3m", "4mm", "6mm"]
     data = read_json(f"{folder}/results-asr.structureinfo.json")
     pointgroup = data["pointgroup"]
@@ -271,11 +282,13 @@ def check_polar_symmetry(folder):
         return False
     
 def check_inversion_symmetry(folder):
+    """Check for inversion symmetry."""
     data = read_json(f"{folder}/results-asr.structureinfo.json")
     invsym = data["has_inversion_symmetry"]
     return invsym
 
 def check_phonons(folder):
+    """Check wheter the phonon calculations completed or not."""
     if os.path.exists(f"{folder}/centrosymmetric_structure/results-asr.phonons_new.FAILED"):
         list_of_files = os.listdir(f"{folder}/centrosymmetric_structure")
         job_numbers = []
@@ -299,6 +312,7 @@ def check_phonons(folder):
     return []
 
 def check_monotonicity(folder):
+    """Check wheter polarization monotonically increases or not."""
     data = read_json(f"{folder}/results-asr.polarization_path.json")
     Px = data["Px_path"]
     Py = data["Py_path"]
@@ -344,11 +358,19 @@ def polarization_quantum_comparison(folder):
 
 if __name__ == "__main__":
     from argparse import ArgumentParser
+
+    logging.basicConfig(level=logging.INFO, 
+    format='[%(asctime)s] %(levelname)s - %(message)s',
+    handlers=[
+    logging.StreamHandler(),  # Log to console
+    logging.FileHandler('error_sources.log')  # Log to file
+    ])
+    logger = logging.getLogger(__name__) 
+
     parser = ArgumentParser()
     parser.add_argument("folders", nargs="*", help="Monolayer folders to analyse.")
     parser.add_argument("-z", "--dryrun", action="store_true", help="Do dry-run.")
     args = parser.parse_args()
-    
     if len(args.folders) > 0:
         folders = [Path(x).absolute() for x in args.folders]
     else:
@@ -452,32 +474,54 @@ if __name__ == "__main__":
         if config == '3D':
             PE_threedim.append(folder)
 
-    print('Number of materials where atoms in the centrosymmetric structure are too close to perform a relaxation:', len(atoms_too_close))
-    print('Number of materials with a metallic state along the polarization path:', len(error_metal_state))
-    print('Number of materials without a bandgap in one of the structures along the polarization path (not detected in reciple):', len(no_gaps))
-    print('Number of materials where a relaxation did not converge:', len(convergence_relaxation))
-    print('Number of materials where a polarization calculation did not converge:', len(convergence))
-    print('Number of materials with a polarization which is not monotonically increasing:', len(non_monotonic))
-    print('Number of materials with a polarization calculation:', len(polarizations))
+    #print('Number of materials where atoms in the centrosymmetric structure are too close to perform a relaxation:', len(atoms_too_close))
+    logger.info(f'Number of materials where atoms in the centrosymmetric structure are too close to perform a relaxation: {len(atoms_too_close)}')
+    #print('Number of materials with a metallic state along the polarization path:', len(error_metal_state))
+    logger.info(f'Number of materials with a metallic state along the polarization path: {len(error_metal_state)}')
+    #print('Number of materials without a bandgap in one of the structures along the polarization path (not detected in reciple):', len(no_gaps))
+    logger.info(f'Number of materials without a bandgap in one of the structures along the polarization path (not detected in reciple): {len(no_gaps)}')
+    #print('Number of materials where a relaxation did not converge:', len(convergence_relaxation))
+    logger.info(f'Number of materials where a relaxation did not converge: {len(convergence_relaxation)}')
+    #print('Number of materials where a polarization calculation did not converge:', len(convergence))
+    logger.info(f'Number of materials where a polarization calculation did not converge: {len(convergence)}')
+    #print('Number of materials with a polarization which is not monotonically increasing:', len(non_monotonic))
+    logger.info(f'Number of materials with a polarization which is not monotonically increasing: {len(non_monotonic)}')
+    #print('Number of materials with a polarization calculation:', len(polarizations))
+    logger.info(f'Number of materials with a polarization calculation: {len(polarizations)}')
 
-    print('Total number of materials:', len(folders))
-    print('Number of ferromagnetic materials with a polarization:', len(ferromagnets))
-    print('Materials where polarization exceeds polarization quantum:', len(pol_pol_q))
+    #print('Total number of materials:', len(folders))
+    logger.info(f'Total number of materials: {len(folders)}')
+    #print('Number of ferromagnetic materials with a polarization:', len(ferromagnets))
+    logger.info(f'Number of ferromagnetic materials with a polarization: {len(ferromagnets)}')
+    #print('Materials where polarization exceeds polarization quantum:', len(pol_pol_q))
+    logger.info(f'Materials where polarization exceeds polarization quantum: {len(pol_pol_q)}')
 
     #print('Phonons done:', len(phonons_done))
+    logger.info(f'Phonons done: {len(phonons_done)}')
     #print('Phonons failed:', len(phonons_failed))
+    logger.info(f'Phonons failed: {len(phonons_failed)}')
     #print('NEB done:', len(neb_done))
+    logger.info(f'NEB done: {len(neb_done)}')
     #print('good NEB:', len(good_neb))
-    print('Pyroelectric materials:', len(atoms_too_close) + len(error_metal_state) + len(no_gaps) + len(non_monotonic) + len(convergence) + len(convergence_relaxation))
-    print('Pyroelectric materials in plane:', len(PE_in_plane))
-    print('Pyroelectric materials out of plane:', len(PE_out_of_plane))
-    print('Pyroelectric materials 3D:', len(PE_threedim))
-    print('Ferroelectric materials in plane:', len(FE_in_plane))
-    print('Ferroelectric materials out of plane:', len(FE_out_of_plane))
-    print('Ferroelectric materials 3D:', len(FE_threedim))
-    print('Inversion symmetric materials:', len(inversion_sym))
-
-    print('Polar materials:', len(polar))
+    logger.info(f'good NEB: {len(good_neb)}')
+    #print('Pyroelectric materials:', len(atoms_too_close) + len(error_metal_state) + len(no_gaps) + len(non_monotonic) + len(convergence) + len(convergence_relaxation))
+    logger.info(f'Pyroelectric materials: {len(atoms_too_close) + len(error_metal_state) + len(no_gaps) + len(non_monotonic) + len(convergence) + len(convergence_relaxation)}')
+    #print('Pyroelectric materials in plane:', len(PE_in_plane))
+    logger.info(f'Pyroelectric materials in plane: {len(PE_in_plane)}')
+    #print('Pyroelectric materials out of plane:', len(PE_out_of_plane))
+    logger.info(f'Pyroelectric materials out of plane: {len(PE_out_of_plane)}')
+    #print('Pyroelectric materials 3D:', len(PE_threedim))
+    logger.info(f'Pyroelectric materials 3D: {len(PE_threedim)}')
+    #print('Ferroelectric materials in plane:', len(FE_in_plane))
+    logger.info(f'Ferroelectric materials in plane: {len(FE_in_plane)}')
+    #print('Ferroelectric materials out of plane:', len(FE_out_of_plane))
+    logger.info(f'Ferroelectric materials out of plane: {len(FE_out_of_plane)}')
+    #print('Ferroelectric materials 3D:', len(FE_threedim))
+    logger.info(f'Ferroelectric materials 3D: {len(FE_threedim)}')
+    #print('Inversion symmetric materials:', len(inversion_sym))
+    logger.info(f'Inversion symmetric materials: {len(inversion_sym)}')
+    #print('Polar materials:', len(polar))
+    logger.info(f'Polar materials: {len(polar)}')
 
     materials_accounted_for =  almost_non_polar + atoms_too_close + error_metal_state + no_gaps + convergence + convergence_relaxation + polarizations 
     materials_not_accounted_for = []
@@ -485,7 +529,7 @@ if __name__ == "__main__":
         if not folder in materials_accounted_for:
             materials_not_accounted_for.append(folder)
             
-    print('Polar materials accounted for:', len(materials_accounted_for))
-    print('Polar materials not accounted for:', len(materials_not_accounted_for))
-
-
+    #print('Polar materials accounted for:', len(materials_accounted_for))
+    logger.info(f'Polar materials accounted for: {len(materials_accounted_for)}')
+    #print('Polar materials not accounted for:', len(materials_not_accounted_for))
+    logger.info(f'Polar materials not accounted for: {len(materials_not_accounted_for)}')

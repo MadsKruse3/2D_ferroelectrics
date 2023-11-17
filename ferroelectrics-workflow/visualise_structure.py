@@ -3,8 +3,7 @@ from ase.build import mx2
 from ase.io import read, write, pov
 from ase.visualize import view
 
-import re, sys, os
-import numpy as np
+import os
 
 if __name__ == "__main__":
     from pathlib import Path
@@ -19,6 +18,9 @@ if __name__ == "__main__":
     else:
         folders = [Path(".").absolute()]
 
+    """These are the parameters used to generate 3D images of various 2D materials.
+    These include (among others) the ones found in figure 1 in:
+    https://www.nature.com/articles/s41524-023-00999-5 """
     ## Params used for:
     # Nb2O2Cl4:
     #polar_structure = polar_structure[polar_structure.get_positions()[:, 0] > 0.1]
@@ -133,6 +135,9 @@ if __name__ == "__main__":
         polar_structure.rotate(0, 'z')
     
         cell = polar_structure.get_cell()
+        """The unit cell is still 3D because of the surrounding vacuum. 
+        This is carved away here. Otherwise the resulting picture is 
+        distorted."""
         cell[0][0] = 25
         cell[1][1] = 25
         cell[2][2] = 25
@@ -157,27 +162,6 @@ if __name__ == "__main__":
                                             # define it according to your wishes
                               }
 
-
-        #if os.path.exists(f'{folder}/centrosymmetric_structure/structure.json'):
-        #    non_polar_structure = read(f'{folder}/centrosymmetric_structure/structure.json')
-        #    non_polar_structure = non_polar_structure.repeat((6, 6, 1))
-        #    non_polar_structure = non_polar_structure[non_polar_structure.get_positions()[:, 0] > -0.5]
-        #    non_polar_structure = non_polar_structure[non_polar_structure.get_positions()[:, 0] < 12.5]
-        #    non_polar_structure = non_polar_structure[non_polar_structure.get_positions()[:, 1] < 22.5]
-        #    non_polar_structure = non_polar_structure[non_polar_structure.get_positions()[:, 1] > -0.5]
-        #    non_polar_structure.rotate(0, 'z')
-
-        #    bondatoms_non_polar = get_bondpairs(non_polar_structure, radius=0.9)
-
-        #    pov_parameters_non_polar = {'canvas_width': 3840,
-        #                                'celllinewidth': 0.0, # define how thick the unit cell lines should be (no
-                                            # unit cell is shown if you set it to zero
-        #                                'bondatoms': bondatoms_non_polar # define which atoms should be connected by bonds,
-                                            # either use the 'get_bondpairs' function or
-                                            # define it according to your wishes
-        #                               }
-        
-
         os.chdir('/home/niflheim/madkru/2D_Ferroelectrics/plots_and_figures/')
 
         filename = name + f'-90x.pov'
@@ -191,35 +175,3 @@ if __name__ == "__main__":
         filename = name + f'-90y.pov'
         write(filename, polar_structure, format='pov', rotation='0x,-90y', radii=0.5,
               povray_settings=pov_parameters_polar).render()
-        
-        #if os.path.exists(f'{folder}/centrosymmetric_structure/structure.json'):
-            #filename = name + 'non-polar' + f'side.pov'
-       #     filename = name + f'non-polar-90x.pov'
-       #     write(filename, non_polar_structure, format='pov', rotation='-90x,0y', radii=0.5,
-       #           povray_settings=pov_parameters_non_polar).render()
-            
-            #filename = name + 'non-polar' + f'side2.pov'
-       #     filename = name + f'non-polar-90y.pov'
-       #     write(filename, non_polar_structure, format='pov', rotation='0x,-90y', radii=0.5,
-       #           povray_settings=pov_parameters_non_polar).render()
-
-            #filename = name + 'non-polar' + f'front.pov'
-       #     filename = name + f'non-polar-0x0y.pov'
-       #     write(filename, non_polar_structure, format='pov', rotation='0x,0y', radii=0.5,
-       #           povray_settings=pov_parameters_non_polar).render()
-
-        #if os.path.exists(f'{folder}/switched_structure/structure_new.json'):
-            #filename = name + 'switched' + f'side.pov'
-        #    filename = name + f'switched-90x.pov' 
-        #    write(filename, switched_structure, format='pov', rotation='-90x,0y', radii=0.5,
-        #          povray_settings=pov_parameters_switched).render()
-
-            #filename = name + 'switched' + f'side2.pov'
-        #    filename = name + f'switched-90y.pov'
-        #    write(filename, switched_structure, format='pov', rotation='0x,-90y', radii=0.5,
-        #          povray_settings=pov_parameters_switched).render()
-
-            #filename = name + 'switched' + f'front.pov'
-        #    filename = name + f'switched-0x0y.pov'
-        #    write(filename, switched_structure, format='pov', rotation='0x,0y', radii=0.5,
-        #          povray_settings=pov_parameters_switched).render()

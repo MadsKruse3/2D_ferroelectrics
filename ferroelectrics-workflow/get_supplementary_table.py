@@ -1,4 +1,4 @@
-"""Script that produces the table in the Supplementary material in in https://arxiv.org/abs/2209.13911"""
+"""Script that produces the table in the Supplementary material in in https://www.nature.com/articles/s41524-023-00999-5"""
 
 from pathlib import Path
 import os, re, sys, latextable

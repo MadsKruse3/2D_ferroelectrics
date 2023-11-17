@@ -1,5 +1,4 @@
-import os
-import sys
+import os, sys
 from pathlib import Path
 import numpy as np
 
@@ -19,9 +18,9 @@ def remove_formal(folder, dryrun=False):
         else:
             print(f"Would remove {f1}")
 
-
-
-if __name__ == "__main__":
+if __name__ == "__main__":¨
+    """Remove result files in folders where the calculations were run by accident
+    (typically because the material turned out the be non-polar) """
     from argparse import ArgumentParser
     parser = ArgumentParser()
     parser.add_argument("folders", nargs="*", help="Bilayer folder to cleanup.")
@@ -33,6 +32,5 @@ if __name__ == "__main__":
     else:
         folders = [Path(".").absolute()]
         
-
     for folder in folders:
         remove_formal(folder, args.dryrun)

@@ -1,7 +1,7 @@
-import os
-import sys
+import os, sys
 from pathlib import Path
 import numpy as np
+
 from ase.io import read
 
 def remove_formal(folder, dryrun=False):
@@ -9,10 +9,7 @@ def remove_formal(folder, dryrun=False):
     if os.path.exists(f'{folder}/structure.json'):
         atom = read(f'{folder}/structure.json')
 
-        #for x in np.linspace(0,1,points):
-            #f0 = f"{folder}/structure_{x}.gpw"
         f0 = f"{folder}/neb_structure_*.gpw"
-            #f1 = f"{folder}/structure_{x}.txt"
 
         if os.path.exists(f0): 
             if not dryrun:
@@ -169,12 +166,13 @@ def remove_formal(folder, dryrun=False):
 #                        print(f"Would remove {f6}")
 
 if __name__ == "__main__":
+    """Remove any memory heavy files (like .gpw) that might be leftover from failed calculations."""
     from argparse import ArgumentParser
     parser = ArgumentParser()
     parser.add_argument("folders", nargs="*", help="folders to cleanup.")
     parser.add_argument("-z", "--dryrun", action="store_true", help="Do dry-run.")
     args = parser.parse_args()
-    
+
     if len(args.folders) > 0:
         folders = [Path(x).absolute() for x in args.folders]
     else:

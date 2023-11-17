@@ -1,10 +1,11 @@
 from pathlib import Path
-import os, re, sys
-from asr.core import read_json
-import matplotlib.pyplot as plt
+import os, sys
 import numpy as np
+
+from asr.core import read_json
+
 from ase.io import read
-from gpaw import GPAW
+
 from evgraf import find_inversion_symmetry
 
 def check_symmetry(folder):
@@ -61,7 +62,6 @@ def verify_polarization2(folder):
         return 'Most likely non polar'
     return True
 
-
 if __name__ == "__main__":
     from argparse import ArgumentParser
     parser = ArgumentParser()
@@ -104,8 +104,7 @@ if __name__ == "__main__":
             material_fingerprint = read_json(f"{folder}/results-asr.database.material_fingerprint.json")
             uid = material_fingerprint["uid"]
             print(uid)
-    f1.close()
-
+    
     sys.stdout = original_stdout
     with open('non_polar_not_relaxed.txt', 'w') as f1:
         sys.stdout = f1
@@ -113,8 +112,7 @@ if __name__ == "__main__":
             material_fingerprint = read_json(f"{folder}/results-asr.database.material_fingerprint.json")
             uid = material_fingerprint["uid"]
             print(uid)
-    f1.close()
-
+    
     sys.stdout = original_stdout
     with open('polar.txt', 'w') as f1:
         sys.stdout = f1
@@ -122,4 +120,3 @@ if __name__ == "__main__":
             material_fingerprint = read_json(f"{folder}/results-asr.database.material_fingerprint.json")
             uid = material_fingerprint["uid"]
             print(uid)
-    f1.close()

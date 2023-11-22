@@ -16,6 +16,7 @@ from tabulate import tabulate
 from texttable import Texttable
 import latextable
 
+
 def get_polarization_direction(folder):
     polarpointgroups1 = ['1', '2', 'm', 'mm2']
     polarpointgroups2 = ['3', '3m', '4', '4mm', '6', '6mm']
@@ -87,7 +88,7 @@ def get_proper_spacegroup(spg):
 
 
 def get_proper_chemical_symbols(name):
-    #name = get_proper_symbolic_order(name)
+    name = get_proper_symbolic_order(name)
     new_word = ''
     for x in name:
         if x.isdigit():
@@ -120,7 +121,7 @@ def get_proper_symbolic_order(name):
                 name[index+1].isdigit()
                 if name[index+1].isdigit():
                     TM_indices.append(index+1)
-            except:
+            except Exception:
                 continue
     if not TM_material:
         return name

@@ -1,5 +1,6 @@
 from pathlib import Path
-import os, logging
+import os
+import logging
 import numpy as np
 
 from asr.core import read_json
@@ -7,30 +8,32 @@ from asr.utils.symmetry import atoms2symmetry
 
 from ase.io import read
 
-from gpaw import GPAW
-
-from evgraf import find_inversion_symmetry
 
 def verify_neb(folder):
-    """Check to see if the polarizations from different Nudged Elastic Band (NEB) calculations are identical or not."""
+    """Check to see if the polarizations from
+    different Nudged Elastic Band (NEB)
+    calculations are identical or not."""
     data1 = read_json(f"{folder}/results-asr.polarization_path.json")
     data2 = read_json(f"{folder}/results-asr.polarization_path2.json")
     P1 = data1["P_tot"]
     P2 = data2["P_tot"]
-    if not np.allclose(P1,P2, rtol=0, atol=0.02):
+    if not np.allclose(P1, P2, rtol=0, atol=0.02):
         return False
-    
+
     Px = data2["Px_path"]
     Py = data2["Py_path"]
     Pz = data2["Pz_path"]
     Ptot = []
     for i in np.arange(len(Px)):
-        Ptot.append(np.sqrt((Px[i]-Px[0])**2 + (Py[i]-Py[0])**2 + (Pz[i]-Pz[0])**2 ))
+        Ptot.append(np.sqrt((Px[i]-Px[0])**2 +
+                            (Py[i]-Py[0])**2 +
+                            (Pz[i]-Pz[0])**2))
     for i in np.arange(len(Ptot)-1):
         if (Ptot[i+1] - Ptot[i]) < 0:
-            if not np.allclose( (Ptot[i+1] - Ptot[i]) , 0, rtol=0, atol=0.001):
-                return False    
+            if not np.allclose((Ptot[i+1] - Ptot[i]), 0, rtol=0, atol=0.001):
+                return False
     return True
+
 
 def get_polarization_direction(folder):
     """Get the direction of polarization for the polar materials."""
@@ -56,15 +59,18 @@ def get_polarization_direction(folder):
                  [0, 0, -1]]]
 
     atom = read(f"{folder}/structure.json")
-    data = atoms2symmetry(atom, tolerance=0.1, angle_tolerance=1) ## tolerance = 0.1 and angle_tolerance = 0.1 in the old version
-    pointgroup = data.dataset['pointgroup']                   
+    data = atoms2symmetry(atom,
+                          tolerance=0.1,
+                          angle_tolerance=1)
+    # tolerance = 0.1 and angle_tolerance = 0.1 in the old version
+    pointgroup = data.dataset['pointgroup']
     config = ''
     if pointgroup in polarpointgroups1:
         data = read_json(f"{folder}/results-asr.structureinfo.json")
         rot_matrices = data["spglib_dataset"]["rotations"]
         for x in rot_matrices:
             for y in rotations:
-                if np.array_equal(x,y):
+                if np.array_equal(x, y):
                     config = 'in plane'
         if config == '':
             config = '3D'
@@ -83,8 +89,9 @@ def get_polarization_direction(folder):
         pol = [pol_in_plane, pol_out_of_plane, pol_tot]
     return config, pol
 
+
 def get_pyroelectric_direction(folder):
-    """For the materials that are non-polar but 
+    """For the materials that are non-polar but
     still pyroeletric check the orientation of the polar axis."""
     polarpointgroups1 = ['1', '2', 'm', 'mm2']
     polarpointgroups2 = ['3', '3m', '4', '4mm', '6', '6mm']
@@ -109,14 +116,15 @@ def get_pyroelectric_direction(folder):
 
     atom = read(f"{folder}/structure.json")
     data = atoms2symmetry(atom, tolerance=0.1, angle_tolerance=1)
-    pointgroup = data.dataset['pointgroup']                   
+    pointgroup = data.dataset['pointgroup']
+
     config = ''
     if pointgroup in polarpointgroups1:
         data = read_json(f"{folder}/results-asr.structureinfo.json")
         rot_matrices = data["spglib_dataset"]["rotations"]
         for x in rot_matrices:
             for y in rotations:
-                if np.array_equal(x,y):
+                if np.array_equal(x, y):
                     config = 'in plane'
         if config == '':
             config = '3D'
@@ -125,13 +133,13 @@ def get_pyroelectric_direction(folder):
 
     return config
 
+
 def check_gaps(folder):
     lambdas = np.linspace(0, 1, 15)
     gaps = []
     for x in lambdas:
-        dpath = f'{folder}/structure_{x}.txt'
         lines = []
-        with open(dpath, 'r') as read_obj:                
+        with open(f'{folder}/structure_{x}.txt', 'r') as read_obj:
             for line in read_obj:
                 line = line.strip()
                 lines.append(line)
@@ -149,6 +157,7 @@ def check_gaps(folder):
         read_obj.close()
     return gaps
 
+
 def check_polarization_errors(folder):
     """Check the polarization calculations to see if there is any errors."""
     if os.path.exists(f"{folder}/asr.polarization_path.state"):
@@ -161,34 +170,32 @@ def check_polarization_errors(folder):
                     job_numbers.append(job_number[2])
 
         mq_job_id = max(job_numbers)
-        dpath = f"{folder}/asr.polarization_path.{mq_job_id}.err"
- 
         with open(f'{folder}/asr.polarization_path.{mq_job_id}.err', 'r') as read_obj:
-            error_lines = []
             for line in read_obj:
                 if 'assert np.all(kpt.f_n[:nocc] > 1e-6' in line:
                     return 'state is metallic'
-              
+
                 if 'assert np.allclose(M, calc.get_magnetic_moment(), atol=0.05)' in line:
                     return 'state is metallic'
-    
+
                 if 'assert np.allclose(np.sum(nocc_s), nvalence' in line:
                     return 'state is metallic'
 
                 if 'Check if the polarization along the a axis has discontinuity' in line:
                     return 'discontinuous polarization path'
-                 
+
                 if 'Check if the polarization along the b axis has discontinuity' in line:
                     return 'discontinuous polarization path'
-                 
+
                 if 'Check if the polarization along the c axis has discontinuity' in line:
                     return 'discontinuous polarization path'
-                 
+
                 if 'gpaw.KohnShamConvergenceError: Did not converge!' in line:
                     return 'One of the DFT calculations did not converge'
 
-            return 'Some other error is present' 
+            return 'Some other error is present'
     return []
+
 
 def check_relaxation_errors(folder):
     """Check the relaxation calculations to see if there is errors."""
@@ -202,24 +209,23 @@ def check_relaxation_errors(folder):
                     job_numbers.append(job_number[2])
 
         mq_job_id = max(job_numbers)
-        dpath = f"{folder}/centrosymmetric_structure/asr.relax.{mq_job_id}.err" 
         with open(f'{folder}/centrosymmetric_structure/asr.relax.{mq_job_id}.err', 'r') as read_obj:
-            error_lines = []
             for line in read_obj:
                 if 'gpaw.KohnShamConvergenceError: Did not converge!' in line:
                     return 'One of the DFT calculations did not converge'
-                    
+
                 if 'gpaw.utilities.AtomsTooClose: Atoms are too close' in line:
                     return 'Atoms too close to each other'
-                
+
                 if 'ValueError: Some atom is too close to the zero-boundary!' in line:
                     return 'Atoms too close to zero boundary'
 
                 if 'RuntimeError: Broken symmetry!' in line:
                     return 'Broken Symmetry'
-            
-            return 'Some other error is present' 
+
+            return 'Some other error is present'
     return []
+
 
 def check_neb_path_errors(folder):
     """Check the Nudged Elastic Band (NEB) calculations."""
@@ -234,24 +240,23 @@ def check_neb_path_errors(folder):
 
         if not len(job_numbers) == 0:
             mq_job_id = max(job_numbers)
-            dpath = f"{folder}/asr.neb_path.{mq_job_id}.err" 
             with open(f'{folder}/asr.neb_path.{mq_job_id}.err', 'r') as read_obj:
-                error_lines = []
                 for line in read_obj:
                     if 'gpaw.KohnShamConvergenceError: Did not converge!' in line:
                         return 'One of the DFT calculations did not converge'
-                    
+
                     if 'slurmstepd: error: *** JOB' in line:
                         return 'TIMEOUT error'
-  
+
                     if 'ValueError: Images have different boundary conditions' in line:
                         return 'boundary error'
-              
+
                     if 'RuntimeError: Parallel NEB failed!' in line:
                         return 'Parallel NEB failed!'
 
-                return 'Some other error is present' 
+                return 'Some other error is present'
     return []
+
 
 def check_polar_symmetry(folder):
     """Check wheter material is polar or not."""
@@ -262,12 +267,14 @@ def check_polar_symmetry(folder):
         return True
     else:
         return False
-    
+
+
 def check_inversion_symmetry(folder):
     """Check for inversion symmetry."""
     data = read_json(f"{folder}/results-asr.structureinfo.json")
     invsym = data["has_inversion_symmetry"]
     return invsym
+
 
 def check_phonons(folder):
     """Check wheter the phonon calculations completed or not."""
@@ -281,17 +288,14 @@ def check_phonons(folder):
                     job_numbers.append(job_number[2])
 
         mq_job_id = max(job_numbers)
-        dpath = f"{folder}/centrosymmetric_structure/asr.phonons_new.{mq_job_id}.err" 
         with open(f'{folder}/centrosymmetric_structure/asr.phonons_new.{mq_job_id}.err', 'r') as read_obj:
-            error_lines = []
             for line in read_obj:
                 if 'gpaw.KohnShamConvergenceError: Did not converge!' in line:
                     read_obj.close()
                     return 'One of the DFT calculations did not converge'
-                    
-            return 'Some other error is present' 
-        read_obj.close()
+            return 'Some other error is present'
     return []
+
 
 def check_monotonicity(folder):
     """Check wheter polarization monotonically increases or not."""
@@ -302,12 +306,15 @@ def check_monotonicity(folder):
     Ptot = []
 
     for i in np.arange(len(Px)):
-        Ptot.append(np.sqrt((Px[i]-Px[0])**2 + (Py[i]-Py[0])**2 + (Pz[i]-Pz[0])**2 ))
+        Ptot.append(np.sqrt((Px[i]-Px[0])**2 +
+                            (Py[i]-Py[0])**2 +
+                            (Pz[i]-Pz[0])**2))
     for i in np.arange(len(Ptot)-1):
         if (Ptot[i+1] - Ptot[i]) < 0:
-            if not np.allclose( (Ptot[i+1] - Ptot[i]) , 0, rtol=0, atol=0.001):
-                return False    
+            if not np.allclose((Ptot[i+1] - Ptot[i]), 0, rtol=0, atol=0.001):
+                return False
     return True
+
 
 def check_monotonicity_NEB(folder):
     data = read_json(f"{folder}/results-asr.polarization_path2.json")
@@ -316,19 +323,22 @@ def check_monotonicity_NEB(folder):
     Pz = data["Pz_path"]
     Ptot = []
     for i in np.arange(len(Px)):
-        Ptot.append(np.sqrt((Px[i]-Px[0])**2 + (Py[i]-Py[0])**2 + (Pz[i]-Pz[0])**2 ))
+        Ptot.append(np.sqrt((Px[i]-Px[0])**2 +
+                            (Py[i]-Py[0])**2 +
+                            (Pz[i]-Pz[0])**2))
     for i in np.arange(len(Ptot)-1):
         if (Ptot[i+1] - Ptot[i]) < 0:
-            if not np.allclose( (Ptot[i+1] - Ptot[i]) , 0, rtol=0, atol=0.001):
-                return False    
+            if not np.allclose((Ptot[i+1] - Ptot[i]), 0, rtol=0, atol=0.001):
+                return False
     return True
+
 
 def polarization_quantum_comparison(folder):
     data = read_json(f"{folder}/results-asr.polarization_path.json")
     Pa = data["Pa"]
     Pb = data["Pb"]
     Pc = data["Pc"]
-    
+
     if Pa > 1:
         return True
     if Pb > 1:
@@ -338,16 +348,17 @@ def polarization_quantum_comparison(folder):
 
     return False
 
+
 if __name__ == "__main__":
     from argparse import ArgumentParser
 
-    logging.basicConfig(level=logging.INFO, 
-    format='[%(asctime)s] %(levelname)s - %(message)s',
-    handlers=[
-    logging.StreamHandler(),  # Log to console
-    logging.FileHandler('error_sources.log')  # Log to file
-    ])
-    logger = logging.getLogger(__name__) 
+    logging.basicConfig(level=logging.INFO,
+                        format='[%(asctime)s] %(levelname)s - %(message)s',
+                        handlers=[
+                            logging.StreamHandler(),  # Log to console
+                            logging.FileHandler('error_sources.log')]  # Log to file
+                        )
+    logger = logging.getLogger(__name__)
 
     parser = ArgumentParser()
     parser.add_argument("folders", nargs="*", help="Monolayer folders to analyse.")
@@ -358,7 +369,7 @@ if __name__ == "__main__":
     else:
         folders = [Path(".").absolute()]
 
-    convergence =  []
+    convergence = []
     convergence_relaxation = []
 
     error_metal_state = []
@@ -382,7 +393,6 @@ if __name__ == "__main__":
     PE_in_plane = []
     PE_out_of_plane = []
     PE_threedim = []
-    
     neb_done = []
     neb_failed = []
     good_neb = []
@@ -427,7 +437,7 @@ if __name__ == "__main__":
                 gaps = check_gaps(folder)
                 if 'No gap' in gaps:
                     no_gaps.append(folder)
-                if not 'No gap' in gaps:
+                if 'No gap' not in gaps:
                     if not check_monotonicity(folder):
                         non_monotonic.append(folder)
                     polarizations.append(folder)
@@ -446,7 +456,7 @@ if __name__ == "__main__":
                         pol_pol_q.append(folder)
 
     pyroelectric = atoms_too_close + error_metal_state + no_gaps + non_monotonic + convergence + convergence_relaxation
-    
+
     for folder in pyroelectric:
         config = get_pyroelectric_direction(folder)
         if config == 'in plane':
@@ -505,12 +515,12 @@ if __name__ == "__main__":
     #print('Polar materials:', len(polar))
     logger.info(f'Polar materials: {len(polar)}')
 
-    materials_accounted_for =  almost_non_polar + atoms_too_close + error_metal_state + no_gaps + convergence + convergence_relaxation + polarizations 
+    materials_accounted_for = almost_non_polar + atoms_too_close + error_metal_state + no_gaps + convergence + convergence_relaxation + polarizations
     materials_not_accounted_for = []
     for folder in polar:
-        if not folder in materials_accounted_for:
+        if folder not in materials_accounted_for:
             materials_not_accounted_for.append(folder)
-            
+
     #print('Polar materials accounted for:', len(materials_accounted_for))
     logger.info(f'Polar materials accounted for: {len(materials_accounted_for)}')
     #print('Polar materials not accounted for:', len(materials_not_accounted_for))
